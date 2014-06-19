@@ -53,6 +53,9 @@
   <ItemGroup>
     <Compile Include="DummyTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Serializer\JSONTest.cs" />
+    <Compile Include="Serializer\SerializerTest.cs" />
+    <Compile Include="Serializer\TypeUtilsTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Source\Unity Game Tools - Source.csproj">
