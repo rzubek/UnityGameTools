@@ -53,10 +53,22 @@ namespace SomaSim.Serializer
         /// <returns></returns>
         public static List<MemberInfo> GetFieldsByType<T>(object obj)
         {
+            return GetFieldsByType(typeof(T), obj);
+        }
+
+        /// <summary>
+        /// Returns all fields or properties of a given type (including subtypes) from the given object
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public static List<MemberInfo> GetFieldsByType(Type t, object obj)
+        {
             MemberInfo[] members = obj.GetType().GetMembers();
-            return members.Where(member => {
+            return members.Where(member =>
+            {
                 Type memberType = GetMemberType(member);
-                return (memberType != null) && typeof(T).IsAssignableFrom(memberType);
+                return (memberType != null) && t.IsAssignableFrom(memberType);
             }).ToList();
         }
 

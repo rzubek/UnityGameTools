@@ -32,6 +32,9 @@ namespace SomaSim.Serializer
             var tc = new TestClass();
             var fields = TypeUtils.GetFieldsByType<FooBar>(tc);
             Assert.IsTrue(fields.Count == 2); // just foo and bar
+
+            var fields2 = TypeUtils.GetFieldsByType(typeof(FooBar), tc);
+            Assert.IsTrue(fields2.Count == 2); // same
         }
 
         [TestMethod]
