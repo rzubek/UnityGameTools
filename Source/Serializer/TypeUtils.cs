@@ -33,6 +33,21 @@ namespace SomaSim.Serializer
         }
 
         /// <summary>
+        /// Takes a target object and a value, and sets any fields inside target object
+        /// that are compatible with value's type to value.
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="value"></param>
+        public static void SetValueByType(object obj, object value)
+        {
+            List<MemberInfo> members = GetFieldsByType(value.GetType(), obj);
+            foreach (MemberInfo member in members)
+            {
+                SetValue(member, obj, value);
+            }
+        }
+
+        /// <summary>
         /// If the member is either a variable or a property, returns its value
         /// </summary>
         /// <param name="i"></param>

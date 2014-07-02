@@ -38,6 +38,17 @@ namespace SomaSim.Serializer
         }
 
         [TestMethod]
+        public void TestSetValueByType()
+        {
+            var tc = new TestClass();
+            Assert.IsNull(tc.bar);
+            TypeUtils.SetValueByType(tc, new Bar());
+            Assert.IsNotNull(tc.bar);
+            Assert.IsNull(tc.foo);
+            Assert.IsNull(tc.baz);
+        }
+
+        [TestMethod]
         public void TestMakeAndRemoveFieldsByType()
         {
             var tc = new TestClass();
