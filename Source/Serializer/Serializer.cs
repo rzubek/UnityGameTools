@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SomaSim;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,7 +20,7 @@ namespace SomaSim.Serializer
     /// - Structures must be trees (ie. no cycles). 
     /// - Serialized classes *must* have default constructors (without parameters)
     /// </summary>
-    public class Serializer
+    public class Serializer : IService
     {
         public string TYPEKEY = "#type";
 
@@ -51,13 +52,13 @@ namespace SomaSim.Serializer
         private Dictionary<string, Type> _ExplicitlyNamedTypes;
         private Dictionary<Type, object> _DefaultInstances;
 
-        public void initialize()
+        public void Initialize()
         {
             this._ExplicitlyNamedTypes = new Dictionary<string, Type>();
             this._DefaultInstances = new Dictionary<Type,object>();
         }
 
-        public void release()
+        public void Release()
         {
             this._DefaultInstances.Clear();
             this._DefaultInstances = null;

@@ -80,7 +80,7 @@ namespace SomaSim.Serializer
         public void TestDeserialization()
         {
             Serializer serializer = new Serializer();
-            serializer.initialize();
+            serializer.Initialize();
 
             Hashtable jsonobj = JSON.JsonDecode(json) as Hashtable;
             Test target = serializer.Deserialize<Test>(jsonobj);
@@ -115,7 +115,7 @@ namespace SomaSim.Serializer
             Assert.IsTrue(target.tTestRecursiveExplicit is Test);
             Assert.IsTrue((target.tTestRecursiveExplicit as Test).ti == 42);
 
-            serializer.release();
+            serializer.Release();
         }
 
         [TestMethod]
@@ -124,7 +124,7 @@ namespace SomaSim.Serializer
             foreach (bool skipDefaults in new bool[] { true, false })
             {
                 Serializer serializer = new Serializer();
-                serializer.initialize();
+                serializer.Initialize();
                 serializer.SkipDefaultsDuringSerialization = skipDefaults;
 
                 Test source = new Test();
@@ -146,7 +146,7 @@ namespace SomaSim.Serializer
                 string json = JSON.JsonEncode(result);
                 Assert.IsNotNull(json);
 
-                serializer.release();
+                serializer.Release();
             }
         }
 
@@ -154,7 +154,7 @@ namespace SomaSim.Serializer
         public void TestSerializationDelta()
         {
             Serializer serializer = new Serializer();
-            serializer.initialize();
+            serializer.Initialize();
             serializer.SkipDefaultsDuringSerialization = true;
 
             Test source = new Test();
@@ -178,14 +178,14 @@ namespace SomaSim.Serializer
             Assert.IsTrue(source.tTestRecursive.tstr == result.tTestRecursive.tstr);
             Assert.IsTrue(source.tTypedDictOfData["foo"].name == result.tTypedDictOfData["foo"].name);
 
-            serializer.release();
+            serializer.Release();
         }
 
         [TestMethod]
         public void TestSerializationDeltaAndJSON()
         {
             Serializer serializer = new Serializer();
-            serializer.initialize();
+            serializer.Initialize();
             serializer.SkipDefaultsDuringSerialization = true;
 
             Test source = new Test();
@@ -216,7 +216,7 @@ namespace SomaSim.Serializer
             Assert.IsTrue(source.tTypedDictOfData["foo"].name == result.tTypedDictOfData["foo"].name);
             Assert.IsTrue(source.tTypedDictOfData["foo"].buy == result.tTypedDictOfData["foo"].buy);
 
-            serializer.release();
+            serializer.Release();
         }
 
     }

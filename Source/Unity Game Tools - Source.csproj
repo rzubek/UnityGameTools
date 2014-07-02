@@ -46,7 +46,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="IService.cs" />
     <Compile Include="Serializer\JSON.cs" />
+    <Compile Include="Serializer\JSONMerger.cs" />
     <Compile Include="Serializer\Serializer.cs" />
     <Compile Include="Serializer\TypeUtils.cs" />
   </ItemGroup>
