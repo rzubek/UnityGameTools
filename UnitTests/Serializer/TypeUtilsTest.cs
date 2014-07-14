@@ -30,10 +30,10 @@ namespace SomaSim.Serializer
         public void TestGetFieldsByType()
         {
             var tc = new TestClass();
-            var fields = TypeUtils.GetFieldsByType<FooBar>(tc);
+            var fields = TypeUtils.GetMembersByType<FooBar>(tc);
             Assert.IsTrue(fields.Count == 2); // just foo and bar
 
-            var fields2 = TypeUtils.GetFieldsByType(typeof(FooBar), tc);
+            var fields2 = TypeUtils.GetMembersByType(typeof(FooBar), tc);
             Assert.IsTrue(fields2.Count == 2); // same
         }
 
@@ -53,13 +53,13 @@ namespace SomaSim.Serializer
         {
             var tc = new TestClass();
             
-            TypeUtils.MakeFieldInstances<FooBar>(tc);
+            TypeUtils.MakeMemberInstances<FooBar>(tc);
             Assert.IsInstanceOfType(tc.foo, typeof(Foo));
             Assert.IsInstanceOfType(tc.bar, typeof(Bar));
             Assert.IsNull(tc.baz);
 
             tc.baz = new Baz();
-            TypeUtils.RemoveFieldInstances<FooBar>(tc);
+            TypeUtils.RemoveMemberInstances<FooBar>(tc);
             Assert.IsNull(tc.foo);
             Assert.IsNull(tc.bar);
             Assert.IsNotNull(tc.baz);

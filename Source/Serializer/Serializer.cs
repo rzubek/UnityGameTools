@@ -179,7 +179,7 @@ namespace SomaSim.Serializer
         private static Dictionary<string, MemberInfo> GetMemberInfos(Type t)
         {
             Dictionary<string, MemberInfo> results = new Dictionary<string, MemberInfo>();
-            foreach (var info in TypeUtils.GetFields(t))
+            foreach (var info in TypeUtils.GetMembers(t))
             {
                 results[info.Name] = info;
             }
@@ -303,7 +303,7 @@ namespace SomaSim.Serializer
                 result[TYPEKEY] = value.GetType().FullName;
             }
 
-            var fields = TypeUtils.GetFields(value);
+            var fields = TypeUtils.GetMembers(value);
             foreach (MemberInfo field in fields)
             {
                 string fieldName = field.Name;
