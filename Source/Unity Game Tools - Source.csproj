@@ -45,6 +45,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ObjectPool\ObjectPool.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="IService.cs" />
     <Compile Include="Serializer\JSON.cs" />

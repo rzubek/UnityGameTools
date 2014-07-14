@@ -51,6 +51,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="ObjectPool\ObjectPoolTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Serializer\JSONMergerTest.cs" />
     <Compile Include="Serializer\JSONTest.cs" />
