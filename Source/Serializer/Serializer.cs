@@ -49,15 +49,20 @@ namespace SomaSim.Serializer
 
         private Dictionary<string, Type> _ExplicitlyNamedTypes;
         private Dictionary<Type, object> _DefaultInstances;
+        private Dictionary<Type, Func<object>> _InstanceFactories;
 
         public void Initialize()
         {
             this._ExplicitlyNamedTypes = new Dictionary<string, Type>();
             this._DefaultInstances = new Dictionary<Type,object>();
+            this._InstanceFactories = new Dictionary<Type, Func<object>>();
         }
 
         public void Release()
         {
+            this._InstanceFactories.Clear();
+            this._InstanceFactories = null;
+
             this._DefaultInstances.Clear();
             this._DefaultInstances = null;
 
@@ -109,7 +114,7 @@ namespace SomaSim.Serializer
             }
 
             // we know the type, make an instance to deserialize into
-            object instance = Activator.CreateInstance(targettype);
+            object instance = CreateInstance(targettype);
 
             // are we deserializing a dictionary?
             if (typeof(IDictionary).IsAssignableFrom(targettype)) 
@@ -439,7 +444,7 @@ namespace SomaSim.Serializer
             object instance = null;
             if (!_DefaultInstances.ContainsKey(t))
             {
-                instance = _DefaultInstances[t] = Activator.CreateInstance(t);                
+                instance = _DefaultInstances[t] = CreateInstance(t);                
             } else {
                 instance = _DefaultInstances[t];
             }
@@ -447,5 +452,30 @@ namespace SomaSim.Serializer
             return TypeUtils.GetValue(field, instance);
         }
 
+        //
+        //
+        // CUSTOM DESERIALIZATION 
+
+        public void RegisterFactory(Type type, Func<object> factory)
+        {
+            _InstanceFactories[type] = factory;
+        }
+
+        public void UnregisterFactory(Type type)
+        {
+            _InstanceFactories.Remove(type);
+        }
+
+        private object CreateInstance(Type type)
+        {
+            if (_InstanceFactories.ContainsKey(type))
+            {
+                return (_InstanceFactories[type]).Invoke();
+            }
+            else
+            {
+                return Activator.CreateInstance(type);
+            }
+        }
     }
 }
