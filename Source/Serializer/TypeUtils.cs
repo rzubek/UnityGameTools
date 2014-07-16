@@ -82,6 +82,17 @@ namespace SomaSim.Serializer
         }
 
         /// <summary>
+        /// Returns all serializable fields or properties of a given type (including subtypes) from the given target type
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="target"></param>
+        /// <returns></returns>
+        public static List<MemberInfo> GetMembersByType<T>(Type target)
+        {
+            return GetMembersByType(typeof(T), target);
+        }
+
+        /// <summary>
         /// Returns all serializable fields or properties of a given type (including subtypes) from the given object
         /// </summary>
         /// <typeparam name="T"></typeparam>
@@ -89,7 +100,18 @@ namespace SomaSim.Serializer
         /// <returns></returns>
         public static List<MemberInfo> GetMembersByType(Type t, object obj)
         {
-            MemberInfo[] members = obj.GetType().GetMembers();
+            return GetMembersByType(t, obj.GetType());
+        }
+
+        /// <summary>
+        /// Returns all serializable fields or properties of a given type (including subtypes) from the given source type
+        /// </summary>
+        /// <param name="t"></param>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        public static List<MemberInfo> GetMembersByType(Type t, Type source)
+        {
+            MemberInfo[] members = source.GetMembers();
             return members.Where(member =>
             {
                 Type memberType = GetMemberType(member);
