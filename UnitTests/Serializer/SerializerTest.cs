@@ -40,6 +40,9 @@ namespace SomaSim.Serializer
 			    { ""name"": ""cottom"",  		""buy"": 12,	""sell"": true }
             ],
 
+            ""tStruct"": {
+                ""i"": 123
+            },
 
             ""tTestRecursive"": {
                 ""ti"": 4
@@ -67,6 +70,16 @@ namespace SomaSim.Serializer
             public object tTestRecursiveExplicit; // instance of test
 
             public Test tTestRecursive;
+            public Test tTestRecursiveEmpty;
+
+            public TestStruct tStruct;
+            public TestStruct tStructEmpty;
+        }
+
+        public struct TestStruct 
+        {
+            public int i;
+            public int j;
         }
 
         public class TestData
@@ -110,6 +123,9 @@ namespace SomaSim.Serializer
             Assert.IsTrue(target.tTypedList[0].buy == 10);
             Assert.IsTrue(target.tTypedList[0].sell);
 
+            Assert.IsTrue(target.tStruct.i == 123);
+            Assert.IsTrue(target.tStruct.j == 0);
+
             Assert.IsTrue(target.tTestRecursive.ti == 4);
 
             Assert.IsTrue(target.tTestRecursiveExplicit is Test);
@@ -142,7 +158,12 @@ namespace SomaSim.Serializer
                 source.tTestRecursive = new Test();
                 source.tTestRecursive.tstr = "Hello World!";
 
+                source.tStruct.i = 42;
+
                 object result = serializer.Serialize(source);
+                Assert.IsTrue(result is Hashtable);
+                Assert.IsTrue(((Hashtable)result).Keys.Count == (skipDefaults ? 10 : 13));
+
                 string json = JSON.JsonEncode(result);
                 Assert.IsNotNull(json);
 

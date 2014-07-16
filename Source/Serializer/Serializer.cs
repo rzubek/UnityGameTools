@@ -305,19 +305,20 @@ namespace SomaSim.Serializer
             foreach (MemberInfo field in fields)
             {
                 string fieldName = field.Name;
-                object fieldValue = Serialize(TypeUtils.GetValue(field, value), false);
+                object rawFieldValue = TypeUtils.GetValue(field, value);
                 bool serialize = true;
 
                 if (SkipDefaultsDuringSerialization)
                 {
                     object defaultValue = GetDefaultInstanceValue(value, field);
-                    serialize = (fieldValue != null) &&
-                                !fieldValue.Equals(defaultValue);
+                    serialize = (rawFieldValue != null) &&
+                                !rawFieldValue.Equals(defaultValue);
                 }
                 
                 if (serialize)
                 {
-                    result[fieldName] = fieldValue;
+                    object serializedFieldValue = Serialize(rawFieldValue, false);
+                    result[fieldName] = serializedFieldValue;
                 }
             }
 
