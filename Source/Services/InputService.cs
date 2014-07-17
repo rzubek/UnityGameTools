@@ -6,14 +6,24 @@ using UnityEngine;
 
 namespace SomaSim.Services
 {
+    public enum InputButton
+    {
+        None = 0,
+        Left,
+        Right,
+        Middle,
+        Wheel
+    }
+
     public interface IInputHandler
     {
         void OnHandlerActivated();
         void OnHandlerDeactivated();
 
         bool OnMove(Vector2 pos);
-        bool OnDown(int button, Vector2 pos);
-        bool OnUp(int button, Vector2 pos);
+        bool OnDown(InputButton button, Vector2 pos);
+        bool OnUp(InputButton button, Vector2 pos);
+        bool OnZoom(float distance);
     }
 
     /// <summary>
@@ -32,6 +42,15 @@ namespace SomaSim.Services
     public class InputService : IUpdateService
     {
         private LinkedList<IInputHandler> _handlers;
+
+        /// <summary>
+        /// Maps from InputButton to definitions in Unity's InputManager.
+        /// Can be replaced by client code, if the inputs have been renamed in the game project.
+        /// List must have the same size as InputButton enums.
+        /// </summary>
+        public List<string> inputButtonNames = new List<string>() {
+            "", "Fire1", "Fire2", "Fire3", "Mouse ScrollWheel"
+        };
 
         public void Initialize()
         {
@@ -89,6 +108,11 @@ namespace SomaSim.Services
 
         #region Input handling
 
+        private string GetButton(InputButton button)
+        {
+            return inputButtonNames[(int)button];
+        }
+
         public void Update()
         {
             if (_handlers.Count == 0)
@@ -101,10 +125,16 @@ namespace SomaSim.Services
                 Vector2 mousepos = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
                 _handlers.FirstOrDefault(h => h.OnMove(mousepos));
 
-                if (Input.GetButtonDown("Fire1"))
+                if (Input.GetButtonDown(GetButton(InputButton.Left)))
                 {
-                    _handlers.FirstOrDefault(h => h.OnDown(0, mousepos));
+                    _handlers.FirstOrDefault(h => h.OnDown(InputButton.Left, mousepos));
                 }
+            }
+
+            float zoom = Input.GetAxis(GetButton(InputButton.Wheel));
+            if (zoom != 0)
+            {
+                _handlers.FirstOrDefault(h => h.OnZoom(zoom));
             }
         }
 
