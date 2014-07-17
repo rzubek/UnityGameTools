@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using UnityEngine;
 
 namespace SomaSim.Services
@@ -20,11 +18,12 @@ namespace SomaSim.Services
         void OnHandlerActivated();
         void OnHandlerDeactivated();
 
-        bool OnMove(Vector2 pos);
-        bool OnDown(InputButton button, Vector2 pos);
-        bool OnUp(InputButton button, Vector2 pos);
-        bool OnZoom(float distance);
+        bool OnTouch(Vector2 pos, TouchPhase phase);
+        //bool OnDown(InputButton button, Vector2 pos);
+        //bool OnUp(InputButton button, Vector2 pos);
+        bool OnZoom(Vector2 pos, float zoom, bool oneshot);
     }
+
 
     /// <summary>
     /// This service unifies input handling between touch and mouse input. It keeps track
@@ -41,19 +40,18 @@ namespace SomaSim.Services
     /// </summary>
     public class InputService : IUpdateService
     {
+        private List<InputSource> _sources;
         private LinkedList<IInputHandler> _handlers;
 
-        /// <summary>
-        /// Maps from InputButton to definitions in Unity's InputManager.
-        /// Can be replaced by client code, if the inputs have been renamed in the game project.
-        /// List must have the same size as InputButton enums.
-        /// </summary>
-        public List<string> inputButtonNames = new List<string>() {
-            "", "Fire1", "Fire2", "Fire3", "Mouse ScrollWheel"
-        };
+        public float dpi { get; private set; }
 
         public void Initialize()
         {
+            dpi = (Screen.dpi > 0) ? Screen.dpi : 72;
+
+            _sources = new List<InputSource>() { new MouseInputSource(), new TouchInputSource() };
+            _sources.ForEach(src => src.Initialize(this));
+
             _handlers = new LinkedList<IInputHandler>();
         }
 
@@ -65,6 +63,9 @@ namespace SomaSim.Services
             }
 
             _handlers = null;
+
+            _sources.ForEach(src => src.Release());
+            _sources = null;
         }
 
         #region Handler stack management
@@ -108,36 +109,18 @@ namespace SomaSim.Services
 
         #region Input handling
 
-        private string GetButton(InputButton button)
-        {
-            return inputButtonNames[(int)button];
-        }
-
         public void Update()
         {
-            if (_handlers.Count == 0)
-            {
-                return; // nobody cares, wah wah
-            }
-
-            if (Input.mousePresent)
-            {
-                Vector2 mousepos = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
-                _handlers.FirstOrDefault(h => h.OnMove(mousepos));
-
-                if (Input.GetButtonDown(GetButton(InputButton.Left)))
-                {
-                    _handlers.FirstOrDefault(h => h.OnDown(InputButton.Left, mousepos));
-                }
-            }
-
-            float zoom = Input.GetAxis(GetButton(InputButton.Wheel));
-            if (zoom != 0)
-            {
-                _handlers.FirstOrDefault(h => h.OnZoom(zoom));
-            }
+            _sources.ForEach(src => src.Update());
         }
 
+        internal void OnTouch (Vector2 pos, TouchPhase phase) {
+            _handlers.FirstOrDefault(h => h.OnTouch(pos, phase));
+        }
+
+        internal void OnZoom (Vector2 pos, float zoom, bool oneshot) {
+            _handlers.FirstOrDefault(h => h.OnZoom(pos, zoom, oneshot));
+        }
 
         #endregion
 

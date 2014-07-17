@@ -48,6 +48,7 @@
     <Compile Include="ObjectPool\ObjectPool.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\InputService.cs" />
+    <Compile Include="Services\InputSources.cs" />
     <Compile Include="Services\IService.cs" />
     <Compile Include="Serializer\JSON.cs" />
     <Compile Include="Serializer\JSONMerger.cs" />
