@@ -18,7 +18,7 @@ namespace SomaSim.Services
         void OnHandlerActivated();
         void OnHandlerDeactivated();
 
-        bool OnTouch(Vector2 pos, TouchPhase phase);
+        bool OnTouch(Vector2 pos, InputPhase phase);
         //bool OnDown(InputButton button, Vector2 pos);
         //bool OnUp(InputButton button, Vector2 pos);
         bool OnZoom(Vector2 pos, float zoom, bool oneshot);
@@ -105,6 +105,15 @@ namespace SomaSim.Services
             return _handlers.First.Value;
         }
 
+        public void Replace(IInputHandler handler)
+        {
+            while (_handlers.Count > 0)
+            {
+                Pop();
+            }
+            Push(handler);
+        }
+
         #endregion
 
         #region Input handling
@@ -114,7 +123,7 @@ namespace SomaSim.Services
             _sources.ForEach(src => src.Update());
         }
 
-        internal void OnTouch (Vector2 pos, TouchPhase phase) {
+        internal void OnInput (Vector2 pos, InputPhase phase) {
             _handlers.FirstOrDefault(h => h.OnTouch(pos, phase));
         }
 

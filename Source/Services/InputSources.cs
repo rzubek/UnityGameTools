@@ -2,6 +2,15 @@
 
 namespace SomaSim.Services
 {
+    public enum InputPhase
+    {
+        None,
+        HoverMoved,
+        TouchBegan,
+        TouchMoved,
+        TouchEnded
+    }
+
     abstract internal class InputSource
     {
         protected InputService _service;
@@ -15,6 +24,19 @@ namespace SomaSim.Services
     {
         public float TouchZoomSensitivity = 3f;
 
+        private InputPhase TouchToInput(TouchPhase phase)
+        {
+            switch (phase)
+            {
+                case TouchPhase.Began: return InputPhase.TouchBegan;
+                case TouchPhase.Ended: return InputPhase.TouchEnded;
+                case TouchPhase.Moved: return InputPhase.TouchMoved;
+                case TouchPhase.Stationary: return InputPhase.TouchMoved;
+                case TouchPhase.Canceled: return InputPhase.TouchEnded;
+                default: return InputPhase.None;
+            }
+        }
+
         override public void Update()
         {    
             if (Input.touchCount <= 0)
@@ -22,14 +44,15 @@ namespace SomaSim.Services
                 return; // nothing to process!
             }
 
-            // at least one touch
-
-            Vector2 pos = Input.GetTouch(0).position;
-            TouchPhase phase = Input.GetTouch(0).phase;
-            _service.OnTouch(pos, phase);
+            // exactly one touch
+            if (Input.touchCount == 1)
+            {
+                Vector2 pos = Input.GetTouch(0).position;
+                TouchPhase phase = Input.GetTouch(0).phase;
+                _service.OnInput(pos, TouchToInput(phase));
+            }
 
             // if there's a second one, do zoom
-
             if (Input.touchCount > 1)
             {
                 Vector2 q0 = Input.GetTouch(0).position, q1 = Input.GetTouch(1).position;
@@ -59,28 +82,27 @@ namespace SomaSim.Services
 
             Vector2 pos = Input.mousePosition;
 
-            if (Input.GetMouseButtonUp(0) && _mouseDown)
+            if ((Input.GetMouseButtonUp(0) && _mouseDown) || // regular mouse up, or
+                (!Input.GetMouseButton(0) && _mouseDown))    // we lost the mouse up event somewhere
             {
-                _service.OnTouch(pos, TouchPhase.Ended);
+                _service.OnInput(pos, InputPhase.TouchEnded);
                 _mouseDown = false;
             }
 
-            if (Input.GetMouseButton(0))
+            if (Input.GetMouseButton(0) && _mouseDown)
             {
-                if (_mouseDown)
-                {
-                    _service.OnTouch(pos, TouchPhase.Moved);
-                }
-                else
-                {
-                    // we need something for hover
-                }
+                _service.OnInput(pos, InputPhase.TouchMoved);
             }
 
             if (Input.GetMouseButtonDown(0) && !_mouseDown)
             {
-                _service.OnTouch(pos, TouchPhase.Began);
+                _service.OnInput(pos, InputPhase.TouchBegan);
                 _mouseDown = true;
+            }
+
+            if (!Input.GetMouseButton(0))
+            {
+                _service.OnInput(pos, InputPhase.HoverMoved);
             }
 
             float wheel = Input.GetAxis(MouseScrollWheelName);
