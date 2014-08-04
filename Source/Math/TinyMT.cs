@@ -62,9 +62,10 @@ namespace SomaSim.Math
         private const int PRE_LOOP = 8;
 
         public uint[] s;
-        public uint m1;
-        public uint m2;
-        public uint mt;
+
+        private uint m1;
+        private uint m2;
+        private uint mt;
 
         public TinyMT()
         {
