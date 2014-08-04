@@ -46,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Math\IRandom.cs" />
+    <Compile Include="Math\MathUtil.cs" />
     <Compile Include="Math\TinyMT.cs" />
     <Compile Include="ObjectPool\ObjectPool.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
