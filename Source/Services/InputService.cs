@@ -22,6 +22,7 @@ namespace SomaSim.Services
         //bool OnDown(InputButton button, Vector2 pos);
         //bool OnUp(InputButton button, Vector2 pos);
         bool OnZoom(Vector2 pos, float zoom, bool oneshot);
+        bool OnCancel();
     }
 
 
@@ -129,6 +130,10 @@ namespace SomaSim.Services
 
         internal void OnZoom (Vector2 pos, float zoom, bool oneshot) {
             _handlers.FirstOrDefault(h => h.OnZoom(pos, zoom, oneshot));
+        }
+
+        internal void OnCancel () {
+            _handlers.FirstOrDefault(h => h.OnCancel());
         }
 
         #endregion

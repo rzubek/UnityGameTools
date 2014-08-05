@@ -105,6 +105,11 @@ namespace SomaSim.Services
                 _service.OnInput(pos, InputPhase.HoverMoved);
             }
 
+            if (Input.GetMouseButtonDown(1)) // right button cancels
+            {
+                _service.OnCancel();
+            }
+
             float wheel = Input.GetAxis(MouseScrollWheelName);
             if (wheel != 0)
             {
