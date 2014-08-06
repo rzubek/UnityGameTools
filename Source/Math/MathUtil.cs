@@ -61,6 +61,31 @@ namespace Game.Util
             return value;
         }
 
+        /// <summary>
+        /// Interpolates between two values. If p = 0, returns a,
+        /// if p = 1, returns b, otherwise returns lerp of both.
+        /// </summary>
+        /// <param name="p"></param>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        public static float Interpolate (float p, float a, float b) {
+            return (1 - p) * a + p * b;
+        }
+
+        /// <summary>
+        /// Finds position of q between two values a and b - an inverse of interpolation. 
+        /// If q = a returns 0, if q = b, returns 1, otherwise returns a value proportional to 
+		/// q's position between them. Throws a division by zero error if a = b.
+        /// </summary>
+        /// <param name="q"></param>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        public static float Uninterpolate (float q, float a, float b) {
+            return (q - a) / (b - a);
+        }
+
         public static bool IsEven (int value) { return (value & 1) == 0; }
         public static bool IsEven (uint value) { return (value & 1) == 0; }
         public static bool IsEven (float value) { return ((int)value & 1) == 0; }

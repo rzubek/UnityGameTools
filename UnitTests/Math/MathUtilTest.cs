@@ -71,5 +71,16 @@ namespace SomaSim.Math
             Assert.IsFalse(MathUtil.IsEven(1f));
             Assert.IsFalse(MathUtil.IsEven(1.1f));
         }
+
+        [TestMethod]
+        public void TestInterpolateAndInverse () {
+            Assert.IsTrue(MathUtil.Interpolate(  0f, -10, 10) == -10);
+            Assert.IsTrue(MathUtil.Interpolate(0.5f, -10, 10) == 0);
+            Assert.IsTrue(MathUtil.Interpolate(  1f, -10, 10) == 10);
+
+            Assert.IsTrue(MathUtil.Uninterpolate(-10, -10, 10) == 0f);
+            Assert.IsTrue(MathUtil.Uninterpolate(  0, -10, 10) == 0.5f);
+            Assert.IsTrue(MathUtil.Uninterpolate( 10, -10, 10) == 1f);
+        }
     }
 }

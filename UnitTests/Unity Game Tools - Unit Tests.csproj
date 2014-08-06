@@ -37,6 +37,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\..\..\Program Files (x86)\Unity\Editor\Data\Managed\UnityEngine.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <Choose>
     <When Condition="('$(VisualStudioVersion)' == '10.0' or '$(VisualStudioVersion)' == '') and '$(TargetFrameworkVersion)' == 'v3.5'">
@@ -59,6 +63,7 @@
     <Compile Include="Serializer\JSONTest.cs" />
     <Compile Include="Serializer\SerializerTest.cs" />
     <Compile Include="Serializer\TypeUtilsTest.cs" />
+    <Compile Include="Serializer\VectorUtilTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Source\Unity Game Tools - Source.csproj">
