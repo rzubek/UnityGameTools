@@ -170,14 +170,14 @@ namespace SomaSim.Serializer
         }
 
         /// <summary>
-        /// Returns all values of variables and properties of a given type (including subtypes, reference only)
+        /// Returns all non-null values of variables and properties of a given type (including subtypes, reference only)
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="serv"></param>
         /// <returns></returns>
         public static List<T> GetMemberInstances<T> (object serv) where T : class {
             var members = GetMembersByType<T>(serv);
-            return members.Select(member => GetValue(member, serv) as T).ToList();
+            return members.Select(member => GetValue(member, serv) as T).Where(member => member != null).ToList();
         }
     }
 }
