@@ -51,15 +51,13 @@ namespace SomaSim.Serializer
         private Dictionary<Type, object> _DefaultInstances;
         private Dictionary<Type, Func<object>> _InstanceFactories;
 
-        public void Initialize()
-        {
+        public void Initialize () {
             this._ExplicitlyNamedTypes = new Dictionary<string, Type>();
-            this._DefaultInstances = new Dictionary<Type,object>();
+            this._DefaultInstances = new Dictionary<Type, object>();
             this._InstanceFactories = new Dictionary<Type, Func<object>>();
         }
 
-        public void Release()
-        {
+        public void Release () {
             this._InstanceFactories.Clear();
             this._InstanceFactories = null;
 
@@ -81,9 +79,8 @@ namespace SomaSim.Serializer
         /// <typeparam name="T"></typeparam>
         /// <param name="value"></param>
         /// <returns></returns>
-        public T Deserialize<T>(object value)
-        {
-            return (T) Deserialize(value, typeof(T));
+        public T Deserialize<T> (object value) {
+            return (T)Deserialize(value, typeof(T));
         }
 
         /// <summary>
@@ -93,23 +90,19 @@ namespace SomaSim.Serializer
         /// <param name="value"></param>
         /// <param name="targettype"></param>
         /// <returns></returns>
-        public object Deserialize(object value, Type targettype = null)
-        {
+        public object Deserialize (object value, Type targettype = null) {
             // reset type to "unknown" if it's insufficiently specific
-            if (targettype == typeof(object))
-            {
+            if (targettype == typeof(object)) {
                 targettype = null;
             }
 
             // scalars get simply converted (if needed)
-            if (IsScalar(value))
-            {
+            if (IsScalar(value)) {
                 return (targettype != null) ? Convert.ChangeType(value, targettype) : value;
             }
 
             // try to infer type from the value if it's a dictionary with a #type key
-            if (targettype == null)
-            {
+            if (targettype == null) {
                 targettype = InferType(value);
             }
 
@@ -117,61 +110,49 @@ namespace SomaSim.Serializer
             object instance = CreateInstance(targettype);
 
             // are we deserializing a dictionary?
-            if (typeof(IDictionary).IsAssignableFrom(targettype)) 
-            {
+            if (typeof(IDictionary).IsAssignableFrom(targettype)) {
                 Hashtable table = value as Hashtable;
-                if (table == null)
-                {
-                    if (ThrowErrorOnUnexpectedCollections)
-                    {
+                if (table == null) {
+                    if (ThrowErrorOnUnexpectedCollections) {
                         throw new Exception("Deserializer found value where Hashtable expected: " + value);
                     }
                     return null;
                 }
 
                 // recursively deserialize all values
-                foreach (DictionaryEntry entry in table)
-                {
+                foreach (DictionaryEntry entry in table) {
                     // do we need to convert values into some specific type?
                     Type valuetype = null;
-                    if (targettype.IsGenericType)
-                    {
+                    if (targettype.IsGenericType) {
                         valuetype = targettype.GetGenericArguments()[1]; // T in Dictionary<S,T>
                     }
                     object typedEntryValue = Deserialize(entry.Value, valuetype);
                     targettype.GetMethod("Add").Invoke(instance, new object[] { entry.Key, typedEntryValue });
                 }
 
-            } 
+            }
 
             // are we deserializing a linear collection?
-            else if (typeof(IEnumerable).IsAssignableFrom(targettype))
-            {
+            else if (typeof(IEnumerable).IsAssignableFrom(targettype)) {
                 // recursively deserialize all values
                 ArrayList list = value as ArrayList;
-                if (list == null)
-                {
-                    if (ThrowErrorOnUnexpectedCollections)
-                    {
+                if (list == null) {
+                    if (ThrowErrorOnUnexpectedCollections) {
                         throw new Exception("Deserializer found value where ArrayList expected: " + value);
                     }
                     return null;
                 }
 
-                foreach (object element in list)
-                {
+                foreach (object element in list) {
                     // do we need to convert values into some specific type?
                     Type valuetype = null;
-                    if (targettype.IsGenericType)
-                    {
+                    if (targettype.IsGenericType) {
                         valuetype = targettype.GetGenericArguments()[0]; // T in List<T>
                     }
                     object typedElement = Deserialize(element, valuetype);
                     targettype.GetMethod("Add").Invoke(instance, new object[] { typedElement });
                 }
-            }
-            else
-            {
+            } else {
                 // class - deserialize each field recursively
                 DeserializeIntoClassOrStruct(value, instance);
             }
@@ -179,11 +160,9 @@ namespace SomaSim.Serializer
             return instance;
         }
 
-        private static Dictionary<string, MemberInfo> GetMemberInfos(Type t)
-        {
+        private static Dictionary<string, MemberInfo> GetMemberInfos (Type t) {
             Dictionary<string, MemberInfo> results = new Dictionary<string, MemberInfo>();
-            foreach (var info in TypeUtils.GetMembers(t))
-            {
+            foreach (var info in TypeUtils.GetMembers(t)) {
                 results[info.Name] = info;
             }
             return results;
@@ -199,31 +178,22 @@ namespace SomaSim.Serializer
             Type targetType = target.GetType();
             var members = GetMemberInfos(targetType);
 
-            if (value is Hashtable)
-            {
+            if (value is Hashtable) {
                 Hashtable table = value as Hashtable;
-                foreach (DictionaryEntry entry in table)
-                {
+                foreach (DictionaryEntry entry in table) {
                     string key = entry.Key as String;
-                    if (key == TYPEKEY)
-                    {
+                    if (key == TYPEKEY) {
                         // ignore it
-                    }
-                    else if (members.ContainsKey(key))
-                    {
+                    } else if (members.ContainsKey(key)) {
                         MemberInfo member = members[key];
                         object fieldval = Deserialize(entry.Value, TypeUtils.GetMemberType(member));
                         if (member is PropertyInfo) { ((PropertyInfo)member).SetValue(target, fieldval, null); }
                         if (member is FieldInfo) { ((FieldInfo)member).SetValue(target, fieldval); }
-                    }
-                    else if (ThrowErrorOnSpuriousData)
-                    {
+                    } else if (ThrowErrorOnSpuriousData) {
                         throw new Exception("Deserializer found key in data but not in class, key=" + key + ", class=" + target);
                     }
                 }
-            }
-            else if (ThrowErrorOnSpuriousData)
-            {
+            } else if (ThrowErrorOnSpuriousData) {
                 throw new Exception("Deserializer can't populate class or struct from a non-hashtable");
             }
         }
@@ -236,7 +206,7 @@ namespace SomaSim.Serializer
         private static List<Type> INT_TYPES = new List<Type> { 
             typeof(Int16), typeof(Int32), typeof(UInt16), typeof(UInt32), typeof(Char), typeof(Byte), typeof(SByte) 
         };
-        
+
         /// <summary>
         /// Serializes a class instance or a collection into a parsed value, ready to be converted into JSON.
         /// Also allows the caller to specify if the type of this instance should be added to the 
@@ -245,12 +215,9 @@ namespace SomaSim.Serializer
         /// <param name="value"></param>
         /// <param name="specifyType"></param>
         /// <returns></returns>
-        public object Serialize(object value, bool specifyType = false)
-        {
-            if (value == null)
-            {
-                if (ThrowErrorOnSerializingNull)
-                {
+        public object Serialize (object value, bool specifyType = false) {
+            if (value == null) {
+                if (ThrowErrorOnSerializingNull) {
                     throw new Exception("Serializer encountered an unexpected null");
                 }
 
@@ -260,20 +227,15 @@ namespace SomaSim.Serializer
             Type type = value.GetType();
 
             // booleans and strings get returned as is
-            if (value is Boolean || value is String)
-            {
+            if (value is Boolean || value is String) {
                 return value;
             }
 
             // numeric types and chars get converted to either a double or an int
-            if (type.IsPrimitive)
-            {
-                if (INT_TYPES.Contains(type))
-                {
+            if (type.IsPrimitive) {
+                if (INT_TYPES.Contains(type)) {
                     return Convert.ToInt32(value);
-                }
-                else
-                {
+                } else {
                     return Convert.ToDouble(value);
                 }
             }
@@ -284,14 +246,12 @@ namespace SomaSim.Serializer
             bool isPotentiallyUntyped = !type.IsGenericType;
 
             // if it's a dictionary, convert to hashtable
-            if (value is IDictionary)
-            {
+            if (value is IDictionary) {
                 return SerializeDictionary(value as IDictionary, isPotentiallyUntyped);
             }
 
             // if it's a list, convert to array list
-            if (typeof(IEnumerable).IsAssignableFrom(type))
-            {
+            if (typeof(IEnumerable).IsAssignableFrom(type)) {
                 return SerializeEnumerable(value as IEnumerable, isPotentiallyUntyped);
             }
 
@@ -299,29 +259,25 @@ namespace SomaSim.Serializer
             return SerializeClassOrStruct(value, specifyType);
         }
 
-        private object SerializeClassOrStruct(object value, bool specifyType)
-        {
+        private object SerializeClassOrStruct (object value, bool specifyType) {
             Hashtable result = new Hashtable();
             if (specifyType) {
                 result[TYPEKEY] = value.GetType().FullName;
             }
 
             var fields = TypeUtils.GetMembers(value);
-            foreach (MemberInfo field in fields)
-            {
+            foreach (MemberInfo field in fields) {
                 string fieldName = field.Name;
                 object rawFieldValue = TypeUtils.GetValue(field, value);
                 bool serialize = true;
 
-                if (SkipDefaultsDuringSerialization)
-                {
+                if (SkipDefaultsDuringSerialization) {
                     object defaultValue = GetDefaultInstanceValue(value, field);
                     serialize = (rawFieldValue != null) &&
                                 !rawFieldValue.Equals(defaultValue);
                 }
-                
-                if (serialize)
-                {
+
+                if (serialize) {
                     object serializedFieldValue = Serialize(rawFieldValue, false);
                     result[fieldName] = serializedFieldValue;
                 }
@@ -330,11 +286,9 @@ namespace SomaSim.Serializer
             return result;
         }
 
-        private Hashtable SerializeDictionary(IDictionary dict, bool specifyValueTypes)
-        {
+        private Hashtable SerializeDictionary (IDictionary dict, bool specifyValueTypes) {
             Hashtable results = new Hashtable();
-            foreach (DictionaryEntry entry in dict)
-            {
+            foreach (DictionaryEntry entry in dict) {
                 object key = entry.Key;
                 object value = Serialize(entry.Value, specifyValueTypes);
                 results[key] = value;
@@ -343,11 +297,9 @@ namespace SomaSim.Serializer
             return results;
         }
 
-        private ArrayList SerializeEnumerable(IEnumerable list, bool specifyValueTypes)
-        {
+        private ArrayList SerializeEnumerable (IEnumerable list, bool specifyValueTypes) {
             ArrayList results = new ArrayList();
-            foreach (object element in list)
-            {
+            foreach (object element in list) {
                 object value = Serialize(element, specifyValueTypes);
                 results.Add(value);
             }
@@ -359,29 +311,23 @@ namespace SomaSim.Serializer
         //
         // HELPERS
 
-        private bool IsScalar(object value)
-        {
+        private bool IsScalar (object value) {
             return value is Double || value is Boolean || value is String;
         }
 
-        private Type FindTypeByName(string name, bool ignoreCase = false, bool cache = true)
-        {
+        private Type FindTypeByName (string name, bool ignoreCase = false, bool cache = true) {
             // do we have it cached?
             Type result = null;
-            if (_ExplicitlyNamedTypes.TryGetValue(name, out result))
-            {
+            if (_ExplicitlyNamedTypes.TryGetValue(name, out result)) {
                 return result;
             }
 
             // search for it the hard way
             Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
-            foreach (var assembly in assemblies)
-            {
+            foreach (var assembly in assemblies) {
                 Type type = assembly.GetType(name, false, ignoreCase);
-                if (type != null)
-                {
-                    if (cache)
-                    {
+                if (type != null) {
+                    if (cache) {
                         this._ExplicitlyNamedTypes[name] = type;
                     }
                     return type;
@@ -391,28 +337,20 @@ namespace SomaSim.Serializer
             return null;
         }
 
-        private Type InferType(object value)
-        {
-            if (value is Hashtable)
-            {
+        private Type InferType (object value) {
+            if (value is Hashtable) {
                 var table = value as Hashtable;
 
                 // see if we have the magical type marker
-                if (table.ContainsKey(TYPEKEY))
-                {
+                if (table.ContainsKey(TYPEKEY)) {
                     // manufacture the type
                     string typestring = table[TYPEKEY] as string;
                     return FindTypeByName(typestring);
-                }
-                else
-                {
+                } else {
                     // it's a dictionary
                     return typeof(Hashtable);
                 }
-            }
-
-            else if (value is ArrayList)
-            {
+            } else if (value is ArrayList) {
                 return typeof(ArrayList);
             }
 
@@ -424,27 +362,23 @@ namespace SomaSim.Serializer
         //
         // INSTANCE CACHE
 
-        private bool HasDefaultInstance(object o)
-        {
+        private bool HasDefaultInstance (object o) {
             return (o != null) && HasDefaultInstance(o.GetType());
         }
 
-        private bool HasDefaultInstance(Type t)
-        {
+        private bool HasDefaultInstance (Type t) {
             return _DefaultInstances.ContainsKey(t);
         }
 
-        private object GetDefaultInstanceValue(object o, MemberInfo field)
-        {
+        private object GetDefaultInstanceValue (object o, MemberInfo field) {
             if (o == null) {
                 return null;
             }
 
             Type t = o.GetType();
             object instance = null;
-            if (!_DefaultInstances.ContainsKey(t))
-            {
-                instance = _DefaultInstances[t] = CreateInstance(t);                
+            if (!_DefaultInstances.ContainsKey(t)) {
+                instance = _DefaultInstances[t] = CreateInstance(t);
             } else {
                 instance = _DefaultInstances[t];
             }
@@ -456,24 +390,18 @@ namespace SomaSim.Serializer
         //
         // CUSTOM DESERIALIZATION 
 
-        public void RegisterFactory(Type type, Func<object> factory)
-        {
+        public void RegisterFactory (Type type, Func<object> factory) {
             _InstanceFactories[type] = factory;
         }
 
-        public void UnregisterFactory(Type type)
-        {
+        public void UnregisterFactory (Type type) {
             _InstanceFactories.Remove(type);
         }
 
-        private object CreateInstance(Type type)
-        {
-            if (_InstanceFactories.ContainsKey(type))
-            {
+        private object CreateInstance (Type type) {
+            if (_InstanceFactories.ContainsKey(type)) {
                 return (_InstanceFactories[type]).Invoke();
-            }
-            else
-            {
+            } else {
                 return Activator.CreateInstance(type);
             }
         }

@@ -25,8 +25,7 @@ namespace SomaSim.Serializer
         ";
 
         [TestMethod]
-        public void TestDecode()
-        {
+        public void TestDecode () {
             object result = JSON.JsonDecode(json1);
             Assert.IsTrue(result is Hashtable);
             Assert.IsTrue((result as Hashtable)["multi"] is Hashtable);
@@ -36,8 +35,7 @@ namespace SomaSim.Serializer
         }
 
         [TestMethod]
-        public void TestDecodeEncode()
-        {
+        public void TestDecodeEncode () {
             object result = JSON.JsonDecode(json1);
             string encoded = JSON.JsonEncode(result);
             Assert.IsNotNull(encoded);

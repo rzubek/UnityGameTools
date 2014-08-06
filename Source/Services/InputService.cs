@@ -15,14 +15,14 @@ namespace SomaSim.Services
 
     public interface IInputHandler
     {
-        void OnHandlerActivated();
-        void OnHandlerDeactivated();
+        void OnHandlerActivated ();
+        void OnHandlerDeactivated ();
 
-        bool OnTouch(Vector2 pos, InputPhase phase);
+        bool OnTouch (Vector2 pos, InputPhase phase);
         //bool OnDown(InputButton button, Vector2 pos);
         //bool OnUp(InputButton button, Vector2 pos);
-        bool OnZoom(Vector2 pos, float zoom, bool oneshot);
-        bool OnCancel();
+        bool OnZoom (Vector2 pos, float zoom, bool oneshot);
+        bool OnCancel ();
     }
 
 
@@ -46,8 +46,7 @@ namespace SomaSim.Services
 
         public float dpi { get; private set; }
 
-        public void Initialize()
-        {
+        public void Initialize () {
             dpi = (Screen.dpi > 0) ? Screen.dpi : 72;
 
             _sources = new List<InputSource>() { new MouseInputSource(), new TouchInputSource() };
@@ -56,10 +55,8 @@ namespace SomaSim.Services
             _handlers = new LinkedList<IInputHandler>();
         }
 
-        public void Release()
-        {
-            while (_handlers.Count > 0)
-            {
+        public void Release () {
+            while (_handlers.Count > 0) {
                 Pop();
             }
 
@@ -71,10 +68,8 @@ namespace SomaSim.Services
 
         #region Handler stack management
 
-        public void Push(IInputHandler handler)
-        {
-            if (_handlers.Count > 0)
-            {
+        public void Push (IInputHandler handler) {
+            if (_handlers.Count > 0) {
                 _handlers.First.Value.OnHandlerDeactivated();
             }
 
@@ -82,34 +77,28 @@ namespace SomaSim.Services
             handler.OnHandlerActivated();
         }
 
-        public IInputHandler Pop()
-        {
+        public IInputHandler Pop () {
             IInputHandler result = null;
 
-            if (_handlers.Count > 0)
-            {
+            if (_handlers.Count > 0) {
                 result = _handlers.First.Value;
                 _handlers.RemoveFirst();
                 result.OnHandlerDeactivated();
             }
 
-            if (_handlers.Count > 0)
-            {
+            if (_handlers.Count > 0) {
                 _handlers.First.Value.OnHandlerActivated();
             }
 
             return result;
         }
 
-        public IInputHandler Peek()
-        {
+        public IInputHandler Peek () {
             return _handlers.First.Value;
         }
 
-        public void Replace(IInputHandler handler)
-        {
-            while (_handlers.Count > 0)
-            {
+        public void Replace (IInputHandler handler) {
+            while (_handlers.Count > 0) {
                 Pop();
             }
             Push(handler);
@@ -119,8 +108,7 @@ namespace SomaSim.Services
 
         #region Input handling
 
-        public void Update()
-        {
+        public void Update () {
             _sources.ForEach(src => src.Update());
         }
 

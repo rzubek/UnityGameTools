@@ -19,8 +19,7 @@ namespace Game.Util
         /// <param name="value"></param>
         /// <param name="step"></param>
         /// <returns></returns>
-        public static float Quantize(float value, float step)
-        {
+        public static float Quantize (float value, float step) {
             return Mathf.Floor(value / step) * step;
         }
 
@@ -32,9 +31,8 @@ namespace Game.Util
         /// <param name="value"></param>
         /// <param name="step"></param>
         /// <returns></returns>
-        public static int Quantize(int value, int step)
-        {
-            return Mathf.FloorToInt((float) value / step) * step;
+        public static int Quantize (int value, int step) {
+            return Mathf.FloorToInt((float)value / step) * step;
         }
 
         /// <summary>
@@ -44,8 +42,7 @@ namespace Game.Util
         /// <param name="min"></param>
         /// <param name="max"></param>
         /// <returns></returns>
-        public static float Clamp(float value, float min = 0f, float max = 1f)
-        {
+        public static float Clamp (float value, float min = 0f, float max = 1f) {
             if (value < min) { return min; }
             if (value > max) { return max; }
             return value;
@@ -58,19 +55,18 @@ namespace Game.Util
         /// <param name="min"></param>
         /// <param name="max"></param>
         /// <returns></returns>
-        public static int Clamp(int value, int min, int max)
-        {
+        public static int Clamp (int value, int min, int max) {
             if (value < min) { return min; }
             if (value > max) { return max; }
             return value;
         }
 
-        public static bool IsEven(int value) { return (value & 1) == 0; }
-        public static bool IsEven(uint value) { return (value & 1) == 0; }
-        public static bool IsEven(float value) { return ((int)value & 1) == 0; }
+        public static bool IsEven (int value) { return (value & 1) == 0; }
+        public static bool IsEven (uint value) { return (value & 1) == 0; }
+        public static bool IsEven (float value) { return ((int)value & 1) == 0; }
 
-        public static bool IsOdd(int value) { return (value & 1) == 1; }
-        public static bool IsOdd(uint value) { return (value & 1) == 1; }
-        public static bool IsOdd(float value) { return ((int)value & 1) == 1; }
+        public static bool IsOdd (int value) { return (value & 1) == 1; }
+        public static bool IsOdd (uint value) { return (value & 1) == 1; }
+        public static bool IsOdd (float value) { return ((int)value & 1) == 1; }
     }
 }

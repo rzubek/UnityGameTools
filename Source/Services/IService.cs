@@ -13,12 +13,12 @@ namespace SomaSim.Services
         /// <summary>
         /// Called when the application starts up to start initializing the service.
         /// </summary>
-        void Initialize();
+        void Initialize ();
 
         /// <summary>
         /// Called when the application shuts down
         /// </summary>
-        void Release();
+        void Release ();
     }
 
     /// <summary>
@@ -29,6 +29,6 @@ namespace SomaSim.Services
         /// <summary>
         /// Called on every frame, from the MonoBehaviour.Update() function.
         /// </summary>
-        void Update();
+        void Update ();
     }
 }

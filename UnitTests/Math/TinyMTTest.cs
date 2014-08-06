@@ -7,8 +7,7 @@ namespace SomaSim.Math
     public class TinyMTTest
     {
         [TestMethod]
-        public void TestTinyMT()
-        {
+        public void TestTinyMT () {
             IRandom rand = new TinyMT();
 
             // these magic constants courtesy of the original C implementation test suite
@@ -22,11 +21,10 @@ namespace SomaSim.Math
         }
 
         [TestMethod]
-        public void TestTinyMTState()
-        {
+        public void TestTinyMTState () {
             TinyMT mt1 = new TinyMT();
             TinyMT mt2 = new TinyMT();
-            
+
             mt1.Init(1);
             Assert.IsTrue(mt1.Generate() == 2545341989);
             Assert.IsTrue(mt1.Generate() == 981918433);

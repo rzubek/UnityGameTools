@@ -19,16 +19,15 @@ namespace SomaSim.Serializer
         public Struct s;
         public TestClass tc;
 
-        public Foo fooFunction() { return null; }
-        public Baz bazFunction() { return null; }
+        public Foo fooFunction () { return null; }
+        public Baz bazFunction () { return null; }
     }
 
     [TestClass]
     public class TypeUtilsTest
     {
         [TestMethod]
-        public void TestGetFieldsByType()
-        {
+        public void TestGetFieldsByType () {
             var tc = new TestClass();
             var fields = TypeUtils.GetMembersByType<FooBar>(tc);
             Assert.IsTrue(fields.Count == 2); // just foo and bar
@@ -38,8 +37,7 @@ namespace SomaSim.Serializer
         }
 
         [TestMethod]
-        public void TestSetValueByType()
-        {
+        public void TestSetValueByType () {
             var tc = new TestClass();
             Assert.IsNull(tc.bar);
             TypeUtils.SetValueByType(tc, new Bar());
@@ -49,10 +47,9 @@ namespace SomaSim.Serializer
         }
 
         [TestMethod]
-        public void TestMakeAndRemoveFieldsByType()
-        {
+        public void TestMakeAndRemoveFieldsByType () {
             var tc = new TestClass();
-            
+
             TypeUtils.MakeMemberInstances<FooBar>(tc);
             Assert.IsInstanceOfType(tc.foo, typeof(Foo));
             Assert.IsInstanceOfType(tc.bar, typeof(Bar));

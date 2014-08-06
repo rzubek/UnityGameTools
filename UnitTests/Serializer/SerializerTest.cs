@@ -76,7 +76,7 @@ namespace SomaSim.Serializer
             public TestStruct tStructEmpty;
         }
 
-        public struct TestStruct 
+        public struct TestStruct
         {
             public int i;
             public int j;
@@ -90,8 +90,7 @@ namespace SomaSim.Serializer
         }
 
         [TestMethod]
-        public void TestDeserialization()
-        {
+        public void TestDeserialization () {
             Serializer serializer = new Serializer();
             serializer.Initialize();
 
@@ -135,10 +134,8 @@ namespace SomaSim.Serializer
         }
 
         [TestMethod]
-        public void TestSerialization()
-        {
-            foreach (bool skipDefaults in new bool[] { true, false })
-            {
+        public void TestSerialization () {
+            foreach (bool skipDefaults in new bool[] { true, false }) {
                 Serializer serializer = new Serializer();
                 serializer.Initialize();
                 serializer.SkipDefaultsDuringSerialization = skipDefaults;
@@ -172,8 +169,7 @@ namespace SomaSim.Serializer
         }
 
         [TestMethod]
-        public void TestSerializationDelta()
-        {
+        public void TestSerializationDelta () {
             Serializer serializer = new Serializer();
             serializer.Initialize();
             serializer.SkipDefaultsDuringSerialization = true;
@@ -203,8 +199,7 @@ namespace SomaSim.Serializer
         }
 
         [TestMethod]
-        public void TestSerializationDeltaAndJSON()
-        {
+        public void TestSerializationDeltaAndJSON () {
             Serializer serializer = new Serializer();
             serializer.Initialize();
             serializer.SkipDefaultsDuringSerialization = true;

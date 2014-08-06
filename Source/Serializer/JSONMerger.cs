@@ -20,59 +20,40 @@ namespace SomaSim.Serializer
     {
         public static bool ThrowExceptionOnBadData = false;
 
-        public static object Merge(object parent, object child)
-        {
-            if (IsScalar(child))
-            {
+        public static object Merge (object parent, object child) {
+            if (IsScalar(child)) {
                 return child;
-            }
-            else if (child is ArrayList)
-            {
+            } else if (child is ArrayList) {
                 return child;
-            }
-            else if (child is Hashtable)
-            {
-                if (! (parent is Hashtable))
-                {
+            } else if (child is Hashtable) {
+                if (!(parent is Hashtable)) {
                     return child;
-                }
-                else
-                {
+                } else {
                     Hashtable chash = child as Hashtable;
                     Hashtable phash = parent as Hashtable;
                     Hashtable result = new Hashtable();
 
-                    foreach (DictionaryEntry entry in phash)
-                    {
+                    foreach (DictionaryEntry entry in phash) {
                         result[entry.Key] = phash[entry.Key];
                     }
 
-                    foreach (DictionaryEntry entry in chash)
-                    {
-                        if (result.ContainsKey(entry.Key))
-                        {
+                    foreach (DictionaryEntry entry in chash) {
+                        if (result.ContainsKey(entry.Key)) {
                             result[entry.Key] = JSONMerger.Merge(phash[entry.Key], chash[entry.Key]);
-                        }
-                        else
-                        {
+                        } else {
                             result[entry.Key] = chash[entry.Key];
                         }
                     }
                     return result;
                 }
-            }
-            else if (ThrowExceptionOnBadData) 
-            {
+            } else if (ThrowExceptionOnBadData) {
                 throw new Exception("Unknown value type for value: " + child);
-            }
-            else
-            {
+            } else {
                 return null; // not valid, boo
             }
         }
 
-        private static bool IsScalar(object value)
-        {
+        private static bool IsScalar (object value) {
             return value is double || value is bool || value is string;
         }
     }

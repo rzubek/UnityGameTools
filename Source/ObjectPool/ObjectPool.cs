@@ -15,7 +15,7 @@ namespace SomaSim.Utils
         /// release any resources used by this entry, and null out any references
         /// that this instance is holding.
         /// </summary>
-        void Reset();
+        void Reset ();
     }
 
     /// <summary>
@@ -41,13 +41,12 @@ namespace SomaSim.Utils
         private Stack<T> _free;
 
         public int UsedListSize { get { return _used.Count; } }
-        public int FreeListSize { get { return _free.Count; } }        
+        public int FreeListSize { get { return _free.Count; } }
 
         /// <summary>
         /// Initializes the object pool.
         /// </summary>
-        public void Initialize ()
-        {
+        public void Initialize () {
             Initialize(() => new T());
         }
 
@@ -56,8 +55,7 @@ namespace SomaSim.Utils
         /// (the factory can initialize the elements in a specific way, for example)
         /// </summary>
         /// <param name="factory"></param>
-        public void Initialize (Func<T> factory)
-        {
+        public void Initialize (Func<T> factory) {
             _factory = factory;
             _used = new List<T>();
             _free = new Stack<T>();
@@ -66,10 +64,8 @@ namespace SomaSim.Utils
         /// <summary>
         /// Releases all elements and resources held by this pool.
         /// </summary>
-        public void Release ()
-        {
-            while (_used.Count > 0)
-            {
+        public void Release () {
+            while (_used.Count > 0) {
                 Free(_used[0]);
             }
 
@@ -85,8 +81,7 @@ namespace SomaSim.Utils
         /// by calling the factory function to generate a brand new instance.
         /// </summary>
         /// <returns></returns>
-        public T Allocate()
-        {
+        public T Allocate () {
             T element = (_free.Count > 0) ? _free.Pop() : _factory.Invoke();
             _used.Add(element);
             return element;
@@ -96,8 +91,7 @@ namespace SomaSim.Utils
         /// Returns the element back to the pool, and resets its data.
         /// </summary>
         /// <param name="element"></param>
-        public void Free(T element)
-        {
+        public void Free (T element) {
             element.Reset();
             _used.Remove(element);
             _free.Push(element);

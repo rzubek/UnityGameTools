@@ -13,19 +13,14 @@ namespace SomaSim.Serializer
         /// </summary>
         /// <param name="i"></param>
         /// <returns></returns>
-        public static Type GetMemberType(MemberInfo i) {
-            if (i is PropertyInfo)
-            {
+        public static Type GetMemberType (MemberInfo i) {
+            if (i is PropertyInfo) {
                 PropertyInfo pi = i as PropertyInfo;
                 return (pi.CanRead && pi.CanWrite) ? pi.PropertyType : null;
-            }
-            else if (i is FieldInfo)
-            {
+            } else if (i is FieldInfo) {
                 FieldInfo fi = i as FieldInfo;
                 return fi.IsPublic ? fi.FieldType : null;
-            }
-            else
-            {
+            } else {
                 return null;
             }
         }
@@ -36,10 +31,8 @@ namespace SomaSim.Serializer
         /// <param name="i"></param>
         /// <param name="obj"></param>
         /// <param name="value"></param>
-        public static void SetValue(MemberInfo i, object obj, object value) {
-            if      (i is PropertyInfo) { ((PropertyInfo)i).SetValue(obj, value, null); }
-            else if (i is FieldInfo) { ((FieldInfo)i).SetValue(obj, value); }
-            else { /* do nothing */ }
+        public static void SetValue (MemberInfo i, object obj, object value) {
+            if (i is PropertyInfo) { ((PropertyInfo)i).SetValue(obj, value, null); } else if (i is FieldInfo) { ((FieldInfo)i).SetValue(obj, value); } else { /* do nothing */ }
         }
 
         /// <summary>
@@ -48,11 +41,9 @@ namespace SomaSim.Serializer
         /// </summary>
         /// <param name="obj"></param>
         /// <param name="value"></param>
-        public static void SetValueByType(object obj, object value)
-        {
+        public static void SetValueByType (object obj, object value) {
             List<MemberInfo> members = GetMembersByType(value.GetType(), obj);
-            foreach (MemberInfo member in members)
-            {
+            foreach (MemberInfo member in members) {
                 SetValue(member, obj, value);
             }
         }
@@ -63,7 +54,7 @@ namespace SomaSim.Serializer
         /// <param name="i"></param>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public static object GetValue(MemberInfo i, object obj) { 
+        public static object GetValue (MemberInfo i, object obj) {
             return
                 (i is PropertyInfo) ? ((PropertyInfo)i).GetValue(obj, null) :
                 (i is FieldInfo) ? ((FieldInfo)i).GetValue(obj) :
@@ -76,8 +67,7 @@ namespace SomaSim.Serializer
         /// <typeparam name="T"></typeparam>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public static List<MemberInfo> GetMembersByType<T>(object obj)
-        {
+        public static List<MemberInfo> GetMembersByType<T> (object obj) {
             return GetMembersByType(typeof(T), obj);
         }
 
@@ -87,8 +77,7 @@ namespace SomaSim.Serializer
         /// <typeparam name="T"></typeparam>
         /// <param name="target"></param>
         /// <returns></returns>
-        public static List<MemberInfo> GetMembersByType<T>(Type target)
-        {
+        public static List<MemberInfo> GetMembersByType<T> (Type target) {
             return GetMembersByType(typeof(T), target);
         }
 
@@ -98,8 +87,7 @@ namespace SomaSim.Serializer
         /// <typeparam name="T"></typeparam>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public static List<MemberInfo> GetMembersByType(Type t, object obj)
-        {
+        public static List<MemberInfo> GetMembersByType (Type t, object obj) {
             return GetMembersByType(t, obj.GetType());
         }
 
@@ -109,11 +97,9 @@ namespace SomaSim.Serializer
         /// <param name="t"></param>
         /// <param name="source"></param>
         /// <returns></returns>
-        public static List<MemberInfo> GetMembersByType(Type t, Type source)
-        {
+        public static List<MemberInfo> GetMembersByType (Type t, Type source) {
             MemberInfo[] members = source.GetMembers();
-            return members.Where(member =>
-            {
+            return members.Where(member => {
                 Type memberType = GetMemberType(member);
                 return (memberType != null) && t.IsAssignableFrom(memberType);
             }).ToList();
@@ -124,11 +110,9 @@ namespace SomaSim.Serializer
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public static List<MemberInfo> GetMembers(object obj)
-        {
+        public static List<MemberInfo> GetMembers (object obj) {
             MemberInfo[] members = obj.GetType().GetMembers();
-            return members.Where(member =>
-            {
+            return members.Where(member => {
                 Type memberType = GetMemberType(member);
                 return (memberType != null);
             }).ToList();
@@ -139,11 +123,9 @@ namespace SomaSim.Serializer
         /// </summary>
         /// <param name="t"></param>
         /// <returns></returns>
-        public static List<MemberInfo> GetMembers(Type t)
-        {
+        public static List<MemberInfo> GetMembers (Type t) {
             MemberInfo[] members = t.GetMembers();
-            return members.Where(member =>
-            {
+            return members.Where(member => {
                 Type memberType = GetMemberType(member);
                 return (memberType != null);
             }).ToList();
@@ -155,11 +137,9 @@ namespace SomaSim.Serializer
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="obj"></param>
-        public static void MakeMemberInstances<T>(object obj)
-        {
+        public static void MakeMemberInstances<T> (object obj) {
             List<MemberInfo> members = GetMembersByType<T>(obj);
-            foreach (MemberInfo member in members)
-            {
+            foreach (MemberInfo member in members) {
                 object instance = Activator.CreateInstance(GetMemberType(member), null);
                 SetValue(member, obj, instance);
             }
@@ -169,11 +149,9 @@ namespace SomaSim.Serializer
         /// Sets all variables and properties on the given object to new instances.
         /// </summary>
         /// <param name="obj"></param>
-        public static void MakeMemberInstancesAll(object obj)
-        {
+        public static void MakeMemberInstancesAll (object obj) {
             List<MemberInfo> members = GetMembers(obj);
-            foreach (MemberInfo member in members)
-            {
+            foreach (MemberInfo member in members) {
                 object instance = Activator.CreateInstance(GetMemberType(member), null);
                 SetValue(member, obj, instance);
             }
@@ -184,11 +162,9 @@ namespace SomaSim.Serializer
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="obj"></param>
-        public static void RemoveMemberInstances<T>(object obj)
-        {
+        public static void RemoveMemberInstances<T> (object obj) {
             List<MemberInfo> members = GetMembersByType<T>(obj);
-            foreach (MemberInfo member in members)
-            {
+            foreach (MemberInfo member in members) {
                 SetValue(member, obj, null);
             }
         }
@@ -199,8 +175,7 @@ namespace SomaSim.Serializer
         /// <typeparam name="T"></typeparam>
         /// <param name="serv"></param>
         /// <returns></returns>
-        public static List<T> GetMemberInstances<T>(object serv) where T : class
-        {
+        public static List<T> GetMemberInstances<T> (object serv) where T : class {
             var members = GetMembersByType<T>(serv);
             return members.Select(member => GetValue(member, serv) as T).ToList();
         }

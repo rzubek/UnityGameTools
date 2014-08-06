@@ -8,8 +8,7 @@ namespace SomaSim.Serializer
     public class JSONMergerTest
     {
         [TestMethod]
-        public void TestMerger()
-        {
+        public void TestMerger () {
             object parent = JSON.JsonDecode(@"
                 {
                     ""Base"": ""base"",

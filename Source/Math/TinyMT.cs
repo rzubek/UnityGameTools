@@ -67,8 +67,7 @@ namespace SomaSim.Math
         private uint m2;
         private uint mt;
 
-        public TinyMT()
-        {
+        public TinyMT () {
             s = new uint[4] { 0, 0, 0, 0 };
             // arbitrary numbers from the original paper's test suite
             Init(1, 0x8f7011ee, 0xfc78ff1f, 0x3793fdff);
@@ -78,8 +77,7 @@ namespace SomaSim.Math
         /// This function changes internal state of tinymt32.
         /// Users should not call this function directly.
         /// </summary>
-        private void NextState()
-        {
+        private void NextState () {
             uint x;
             uint y;
 
@@ -102,8 +100,7 @@ namespace SomaSim.Math
         /// This function outputs 32-bit unsigned integer from internal state.
         /// Users should not call this function directly.
         /// </summary>
-        private uint Temper()
-        {
+        private uint Temper () {
             uint t0, t1;
             t0 = s[3];
             t1 = s[0] + (s[2] >> TINYMT32_SH8);
@@ -117,41 +114,35 @@ namespace SomaSim.Math
         /// This function initializes the internal state array with a 32-bit
         /// unsigned integer seed and random number generator state variables.
         /// </summary>
-        private void Init(uint seed, uint mat1, uint mat2, uint tmat)
-        {
+        private void Init (uint seed, uint mat1, uint mat2, uint tmat) {
             s[0] = seed;
             s[1] = this.m1 = mat1;
             s[2] = this.m2 = mat2;
             s[3] = this.mt = tmat;
-            for (uint i = 1; i < MIN_LOOP; i++)
-            {
+            for (uint i = 1; i < MIN_LOOP; i++) {
                 s[i & 3] ^= i + (uint)(1812433253)
                     * (s[(i - 1) & 3]
                        ^ (s[(i - 1) & 3] >> 30));
             }
 
-            for (int i = 0; i < PRE_LOOP; i++)
-            {
+            for (int i = 0; i < PRE_LOOP; i++) {
                 NextState();
             }
         }
 
         /// <inheritDoc/>
-        public void Init(uint seed)
-        {
+        public void Init (uint seed) {
             Init(seed, m1, m2, mt);
         }
 
         /// <inheritDoc/>
-        public uint Generate()
-        {
+        public uint Generate () {
             NextState();
             return Temper();
         }
 
         /// <inheritDoc/>
-        public float GenerateFloat()
-        {
+        public float GenerateFloat () {
             NextState();
             return Temper() * TINYMT32_MUL;
         }

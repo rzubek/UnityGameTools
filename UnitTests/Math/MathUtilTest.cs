@@ -8,8 +8,7 @@ namespace SomaSim.Math
     public class MathUtilTest
     {
         [TestMethod]
-        public void TestQuantize()
-        {
+        public void TestQuantize () {
             // floats
             Assert.IsTrue(MathUtil.Quantize(-10f, 5f) == -10f);
             Assert.IsTrue(MathUtil.Quantize(-5.01f, 5f) == -10f);
@@ -32,8 +31,7 @@ namespace SomaSim.Math
         }
 
         [TestMethod]
-        public void TestClamp()
-        {
+        public void TestClamp () {
             // floats
             Assert.IsTrue(MathUtil.Clamp(-1f, 0f, 1f) == 0f);
             Assert.IsTrue(MathUtil.Clamp(0f, 0f, 1f) == 0f);
@@ -50,8 +48,7 @@ namespace SomaSim.Math
         }
 
         [TestMethod]
-        public void TestEvenOdd()
-        {
+        public void TestEvenOdd () {
             Assert.IsTrue(MathUtil.IsEven(-2));
             Assert.IsTrue(MathUtil.IsEven(0));
             Assert.IsTrue(MathUtil.IsEven((uint)2));

@@ -7,8 +7,7 @@ namespace SomaSim.Utils
     {
         public int value;
 
-        public void Reset()
-        {
+        public void Reset () {
             value = 0;
         }
     }
@@ -17,8 +16,7 @@ namespace SomaSim.Utils
     public class ObjectPoolTest
     {
         [TestMethod]
-        public void TestAllocateAndFree()
-        {
+        public void TestAllocateAndFree () {
             var pool = new ObjectPool<TestElement>();
             pool.Initialize();
 
@@ -46,8 +44,7 @@ namespace SomaSim.Utils
         }
 
         [TestMethod]
-        public void TestFactoryAndReset()
-        {
+        public void TestFactoryAndReset () {
             var pool = new ObjectPool<TestElement>();
             pool.Initialize(() => { var e = new TestElement(); e.value = 42; return e; });
 
@@ -67,8 +64,7 @@ namespace SomaSim.Utils
         }
 
         [TestMethod]
-        public void TestPoolRelease()
-        {
+        public void TestPoolRelease () {
             var pool = new ObjectPool<TestElement>();
             pool.Initialize(() => { var e = new TestElement(); e.value = 42; return e; });
 
