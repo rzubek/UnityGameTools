@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace SomaSim.Math
 {
@@ -27,6 +24,47 @@ namespace SomaSim.Math
         /// </summary>
         /// <returns></returns>
         float GenerateFloat ();
+    }
 
+    /// <summary>
+    /// Extension methods for random number generators
+    /// </summary>
+    public static class RandomExtensions
+    {
+        /// <summary>
+        /// Generates the next random value in the half-open range [min, max)
+        /// </summary>
+        /// <param name="rand"></param>
+        /// <param name="min"></param>
+        /// <param name="max"></param>
+        /// <returns></returns>
+        public static int GenerateInRange (this IRandom rand, int min, int max) {
+            uint p = rand.Generate();
+            uint mod = (uint) (p % (max - min));
+			return (int) (mod + min);
+        }
+
+        /// <summary>
+        /// Generates the next random float in the half-open range [min, max)
+        /// </summary>
+        /// <param name="rand"></param>
+        /// <param name="min"></param>
+        /// <param name="max"></param>
+        /// <returns></returns>
+        public static float GenerateInRange (this IRandom rand, float min, float max) {
+            uint p = rand.Generate();
+            return p * (max - min) + min;
+        }
+
+        /// <summary>
+        /// Picks a random element from the collection.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        public static T PickElement<T> (this IRandom rand, IList<T> list) {
+            int index = rand.GenerateInRange(0, list.Count);
+            return list[index];
+        }
     }
 }
