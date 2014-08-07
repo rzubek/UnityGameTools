@@ -33,5 +33,22 @@ namespace SomaSim.Math
             mt1.s.CopyTo(mt2.s, 0);
             Assert.IsTrue(mt2.Generate() == 3715302833 && mt1.Generate() == 3715302833);
         }
+
+        [TestMethod]
+        public void TestIRandomExtensionMethods () {
+            IRandom rand = new TinyMT();
+
+            rand.Init(1); // 2545341989 will be the first number
+            Assert.IsTrue(rand.GenerateInRange(0, 5) == 4); // 2545341989 % 5 = 4
+
+            rand.Init(1);
+            Assert.IsTrue(rand.GenerateInRange(1, 6) == 5); // 2545341989 % 5 + 1 = 5
+
+            rand.Init(1);
+            Assert.IsTrue(rand.PickElement(new uint[] { 0, 1, 2, 3, 4 }) == 4); // 2545341989 % 5 = 4, so 4th element
+
+            rand.Init(1); // 2545341989 will be the first number
+            Assert.IsTrue(rand.DieRoll(10) == 10); // last digit of 2545341989 plus one
+        }
     }
 }

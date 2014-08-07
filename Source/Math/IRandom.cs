@@ -57,6 +57,17 @@ namespace SomaSim.Math
         }
 
         /// <summary>
+        /// Generates the next value for the roll of a die with specified number of sides.
+        /// For example, sides = 20 will generate values in the range [1, 20] for a d20 die.
+        /// </summary>
+        /// <param name="rand"></param>
+        /// <param name="diesize"></param>
+        /// <returns></returns>
+        public static uint DieRoll (this IRandom rand, uint sides) {
+            return (uint)(GenerateInRange(rand, 0, (int)sides) + 1);
+        }
+
+        /// <summary>
         /// Picks a random element from the collection.
         /// </summary>
         /// <typeparam name="T"></typeparam>

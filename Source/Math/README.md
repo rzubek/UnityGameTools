@@ -18,6 +18,18 @@ float secondRandomValue = rand.GenerateFloat();  // in range [0, 1)
 
 ```
 
+Random Number Extension Methods
+---
+
+Just a few extension methods to make TinyMT (and in the future, other RNGs) easier to use.
+
+```csharp
+IRandom rand = new TinyMT();
+var foo = rand.DieRoll(6); // random die roll between 1 and 6
+var bar = rand.PickElement(new uint[] { 0, 1, 2, 3, 4 }); // picks one randomly
+var baz = rand.GenerateInRange(0, 100); // number from 0 up to but excluding 100
+
+```
 
 
 
