@@ -37,7 +37,9 @@ namespace SomaSim.Math
         public int to;
         public byte passes;
 
-        public RandomRange (int from = 0, int to = 1, byte passes = 1) {
+        public RandomRange () : this(0, 1, 1) { }
+
+        public RandomRange (int from, int to, byte passes = 1) {
             this.from = from;
             this.to = to;
             this.passes = passes;
