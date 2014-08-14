@@ -39,16 +39,25 @@ namespace SomaSim.Math
             IRandom rand = new TinyMT();
 
             rand.Init(1); // 2545341989 will be the first number
-            Assert.IsTrue(rand.GenerateInRange(0, 5) == 4); // 2545341989 % 5 = 4
+            Assert.IsTrue(rand.Generate(0, 5) == 4); // 2545341989 % 5 = 4
 
             rand.Init(1);
-            Assert.IsTrue(rand.GenerateInRange(1, 6) == 5); // 2545341989 % 5 + 1 = 5
+            Assert.IsTrue(rand.Generate(1, 6) == 5); // 2545341989 % 5 + 1 = 5
 
             rand.Init(1);
             Assert.IsTrue(rand.PickElement(new uint[] { 0, 1, 2, 3, 4 }) == 4); // 2545341989 % 5 = 4, so 4th element
 
-            rand.Init(1); // 2545341989 will be the first number
+            rand.Init(1); 
             Assert.IsTrue(rand.DieRoll(10) == 10); // last digit of 2545341989 plus one
+
+            RandomRange range = new RandomRange(0, 10, 3);
+            rand.Init(1);
+            // first random number: 2545341989 % 10 = 9
+            // second random number: 981918433 % 10 = 3
+            // third random number: 3715302833 % 10 = 3
+            // total: 15, over three passes: result = 5
+            Assert.IsTrue(rand.Generate(range) == 5);
+
         }
     }
 }

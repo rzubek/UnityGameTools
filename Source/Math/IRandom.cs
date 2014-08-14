@@ -27,6 +27,24 @@ namespace SomaSim.Math
     }
 
     /// <summary>
+    /// Simple data structure that encapsulates both a range of numbers for a random number generator,
+    /// and the number of passes (one pass to generate a uniform distribution, more passes to
+    /// approximate normal distribution).
+    /// </summary>
+    public class RandomRange
+    {
+        public int from;
+        public int to;
+        public byte passes;
+
+        public RandomRange (int from = 0, int to = 1, byte passes = 1) {
+            this.from = from;
+            this.to = to;
+            this.passes = passes;
+        }
+    }
+
+    /// <summary>
     /// Extension methods for random number generators
     /// </summary>
     public static class RandomExtensions
@@ -38,7 +56,7 @@ namespace SomaSim.Math
         /// <param name="min"></param>
         /// <param name="max"></param>
         /// <returns></returns>
-        public static int GenerateInRange (this IRandom rand, int min, int max) {
+        public static int Generate (this IRandom rand, int min, int max) {
             uint p = rand.Generate();
             uint mod = (uint) (p % (max - min));
 			return (int) (mod + min);
@@ -51,9 +69,24 @@ namespace SomaSim.Math
         /// <param name="min"></param>
         /// <param name="max"></param>
         /// <returns></returns>
-        public static float GenerateInRange (this IRandom rand, float min, float max) {
+        public static float Generate (this IRandom rand, float min, float max) {
             uint p = rand.Generate();
             return p * (max - min) + min;
+        }
+
+        /// <summary>
+        /// Generates the next random value in the half-open range [range.min, range.max)
+        /// with a distribution specified by the range.passes value.
+        /// </summary>
+        /// <param name="rng"></param>
+        /// <param name="range"></param>
+        /// <returns></returns>
+        public static int Generate (this IRandom rng, RandomRange range) {
+            long total = 0;
+            for (int i = 0; i < range.passes; i++) {
+                total += rng.Generate(range.from, range.to);
+            }
+            return (int)(total / range.passes);
         }
 
         /// <summary>
@@ -64,7 +97,7 @@ namespace SomaSim.Math
         /// <param name="diesize"></param>
         /// <returns></returns>
         public static uint DieRoll (this IRandom rand, uint sides) {
-            return (uint)(GenerateInRange(rand, 0, (int)sides) + 1);
+            return (uint)(Generate(rand, 0, (int)sides) + 1);
         }
 
         /// <summary>
@@ -74,8 +107,9 @@ namespace SomaSim.Math
         /// <param name="list"></param>
         /// <returns></returns>
         public static T PickElement<T> (this IRandom rand, IList<T> list) {
-            int index = rand.GenerateInRange(0, list.Count);
+            int index = rand.Generate(0, list.Count);
             return list[index];
         }
+
     }
 }
