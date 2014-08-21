@@ -98,10 +98,14 @@ namespace SomaSim.Services
         }
 
         public void Replace (IInputHandler handler) {
+            Flush();
+            Push(handler);
+        }
+
+        public void Flush () {
             while (_handlers.Count > 0) {
                 Pop();
             }
-            Push(handler);
         }
 
         #endregion
