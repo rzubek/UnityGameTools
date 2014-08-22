@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 
 namespace SomaSim.Math
 {
@@ -113,5 +114,15 @@ namespace SomaSim.Math
             return list[index];
         }
 
+        /// <summary>
+        /// Picks a random element from the collection.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        public static T PickElement<T> (this IRandom rand, IList list) where T : class {
+            int index = rand.Generate(0, list.Count);
+            return list[index] as T;
+        }
     }
 }
