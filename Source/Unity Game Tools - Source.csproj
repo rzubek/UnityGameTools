@@ -46,9 +46,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Math\IRandom.cs" />
+    <Compile Include="Math\Mappers.cs" />
     <Compile Include="Math\MathUtil.cs" />
     <Compile Include="Math\TinyMT.cs" />
-    <Compile Include="Math\VectorUtil.cs" />
+    <Compile Include="Math\Util.cs" />
     <Compile Include="ObjectPool\ObjectPool.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\InputService.cs" />

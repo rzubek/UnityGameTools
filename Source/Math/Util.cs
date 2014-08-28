@@ -43,4 +43,33 @@ namespace SomaSim.Math
             }
         }
     }
+
+    /// <summary>
+    /// Collection of color utilities
+    /// </summary>
+    public class ColorUtil
+    {
+        /// <summary>
+        /// Converts a Color into an HTML compatible hex value in the "rrggbb" format. Alpha is ignored.
+        /// Adopted from http://wiki.unity3d.com/index.php?title=HexConverter
+        /// </summary>
+        /// <param name="color"></param>
+        /// <returns></returns>
+        public static string ColorToHex (Color32 color) {
+            return color.r.ToString("X2") + color.g.ToString("X2") + color.b.ToString("X2");
+        }
+
+        /// <summary>
+        /// Converts an HTML compatible hex string in the "rrggbb" format into a Color value.
+        /// Alpha is set to full (1.0). Adopted from http://wiki.unity3d.com/index.php?title=HexConverter
+        /// </summary>
+        /// <param name="hex"></param>
+        /// <returns></returns>
+        public static Color32 HexToColor (string hex) {
+            byte r = byte.Parse(hex.Substring(0, 2), System.Globalization.NumberStyles.HexNumber);
+            byte g = byte.Parse(hex.Substring(2, 2), System.Globalization.NumberStyles.HexNumber);
+            byte b = byte.Parse(hex.Substring(4, 2), System.Globalization.NumberStyles.HexNumber);
+            return new Color32(r, g, b, 255);
+        }
+    }
 }

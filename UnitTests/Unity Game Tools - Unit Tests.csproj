@@ -63,7 +63,7 @@
     <Compile Include="Serializer\JSONTest.cs" />
     <Compile Include="Serializer\SerializerTest.cs" />
     <Compile Include="Serializer\TypeUtilsTest.cs" />
-    <Compile Include="Serializer\VectorUtilTest.cs" />
+    <Compile Include="Math\UtilTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Source\Unity Game Tools - Source.csproj">
