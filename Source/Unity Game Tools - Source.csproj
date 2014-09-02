@@ -45,6 +45,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Collections\SmartStack.cs" />
     <Compile Include="Math\IRandom.cs" />
     <Compile Include="Math\Mappers.cs" />
     <Compile Include="Math\MathUtil.cs" />
@@ -60,6 +61,7 @@
     <Compile Include="Serializer\Serializer.cs" />
     <Compile Include="Serializer\TypeUtils.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>del "$(SolutionDir)..\Assets\$(TargetName).dll"
