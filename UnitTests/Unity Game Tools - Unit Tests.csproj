@@ -55,6 +55,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="Collections\SmartQueueTest.cs" />
     <Compile Include="Collections\SmartStackTest.cs" />
     <Compile Include="Math\TinyMTTest.cs" />
     <Compile Include="Math\MathUtilTest.cs" />

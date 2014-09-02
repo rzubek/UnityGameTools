@@ -45,6 +45,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Collections\SmartQueue.cs" />
     <Compile Include="Collections\SmartStack.cs" />
     <Compile Include="Math\IRandom.cs" />
     <Compile Include="Math\Mappers.cs" />
