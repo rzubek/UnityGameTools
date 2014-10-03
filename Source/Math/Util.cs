@@ -23,18 +23,40 @@ namespace SomaSim.Math
 		///       Other p-norms are also supported, as long as p >= 1.</param>
         /// <returns></returns>
         public static float Distance (Vector2 a, Vector2 b, float p = 2) {
-
             if (p == 2) { // optimization for the default case
                 return Vector2.Distance(a, b);
+            } else {
+                return Distance(a.x, a.y, b.x, b.y, p);
+            }
+        }
+
+        /// <summary>
+        /// Distance between two points (ax,ay) and (bx,by) using a specified norm.
+        /// </summary>
+        /// <param name="ax"></param>
+        /// <param name="ay"></param>
+        /// <param name="bx"></param>
+        /// <param name="by"></param>
+        /// <param name="p"></param>
+        /// <returns></returns>
+        public static float Distance (float ax, float ay, float bx, float by, float p = 2) {
+            float dx = ax - bx;
+            float dy = ay - by;
+
+            if (p == 2) { // optimization for the default case
+                return Mathf.Sqrt(dx * dx + dy * dy);
             }
 
-            float absdx = Mathf.Abs(a.x - b.x);
-            float absdy = Mathf.Abs(a.y - b.y);
+            // other cases
+            float absdx = Mathf.Abs(dx);
+            float absdy = Mathf.Abs(dy);
 
             if (p == 1) {
                 return absdx + absdy;
+
             } else if (float.IsPositiveInfinity(p)) {
                 return Mathf.Max(absdx, absdy);
+
             } else { // generic case
                 if (p < 1) {
                     throw new Exception("P-norm < 1 not supported!");
