@@ -86,6 +86,30 @@ namespace Game.Util
             return (q - a) / (b - a);
         }
 
+        /// <summary>
+        /// Modulus function, in in C# the % operator is not mod, it's actually a remainder, and can be negative.
+        /// For example, Modulus(1, 3) == 1 and 1 % 3 == 1, but Modulus(-1, 3) == 2, while -1 % 3 == -1.
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        public static float Modulus (float a, float b) {
+            float r = a % b;
+            return (r < 0) ? r + b : r;
+        }
+
+        /// <summary>
+        /// Modulus function, in in C# the % operator is not mod, it's actually a remainder, and can be negative.
+        /// For example, Modulus(1, 3) == 1 and 1 % 3 == 1, but Modulus(-1, 3) == 2, while -1 % 3 == -1.
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        public static int Modulus (int a, int b) {
+            int r = a % b;
+            return (r < 0) ? r + b : r;
+        }
+
         public static bool IsEven (int value) { return (value & 1) == 0; }
         public static bool IsEven (uint value) { return (value & 1) == 0; }
         public static bool IsEven (float value) { return ((int)value & 1) == 0; }

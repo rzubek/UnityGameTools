@@ -82,5 +82,19 @@ namespace SomaSim.Math
             Assert.IsTrue(MathUtil.Uninterpolate(  0, -10, 10) == 0.5f);
             Assert.IsTrue(MathUtil.Uninterpolate( 10, -10, 10) == 1f);
         }
+
+        [TestMethod]
+        public void TestModulus () {
+            Assert.IsTrue(MathUtil.Modulus(5, 3) == 2);
+            Assert.IsTrue(MathUtil.Modulus(4, 3) == 1);
+            Assert.IsTrue(MathUtil.Modulus(3, 3) == 0);
+            Assert.IsTrue(MathUtil.Modulus(2, 3) == 2);
+            Assert.IsTrue(MathUtil.Modulus(1, 3) == 1);
+            Assert.IsTrue(MathUtil.Modulus(0, 3) == 0);
+            Assert.IsTrue(MathUtil.Modulus(-1, 3) == 2);
+            Assert.IsTrue(MathUtil.Modulus(-2, 3) == 1);
+            Assert.IsTrue(MathUtil.Modulus(-3, 3) == 0);
+            Assert.IsTrue(MathUtil.Modulus(-4, 3) == 2);
+        }
     }
 }
