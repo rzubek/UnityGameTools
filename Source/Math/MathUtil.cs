@@ -110,6 +110,38 @@ namespace Game.Util
             return (r < 0) ? r + b : r;
         }
 
+        /// <summary>
+        /// Given ranges of given size starting at 0, counts how many times the range boundary was crossed in the 
+        /// interval between from and to. For example, given period of 5, the ranges would be [0, 5), [5, 10), [10, 15), etc.
+        /// So if we take 1 as our from value, from 1 to 4 there are zero crossings, from 1 to 7 there is one (at 5), 
+        /// from 1 to 13 there are two (at 5 and 10), and so on.
+        /// </summary>
+        /// <param name="from"></param>
+        /// <param name="to"></param>
+        /// <param name="period"></param>
+        /// <returns></returns>
+        public static int CountIntervals (int from, int to, int period) {
+            int first = (int) Math.Floor((double)from / period);
+            int last = (int) Math.Floor((double)to / period);
+            return last - first;
+        }
+
+        /// <summary>
+        /// Given ranges of given size starting at 0, counts how many times the range boundary was crossed in the 
+        /// interval between from and to. For example, given period of 5, the ranges would be [0, 5), [5, 10), [10, 15), etc.
+        /// So if we take 1 as our from value, from 1 to 4.999 there are zero crossings, from 1 to 5 there is one (at 5), 
+        /// from 1 to 13 there are two (at 5 and 10), and so on.
+        /// </summary>
+        /// <param name="from"></param>
+        /// <param name="to"></param>
+        /// <param name="period"></param>
+        /// <returns></returns>
+        public static int CountIntervals (float from, float to, float period) {
+            int first = (int)Math.Floor((double)from / period);
+            int last = (int)Math.Floor((double)to / period);
+            return last - first;
+        }
+
         public static bool IsEven (int value) { return (value & 1) == 0; }
         public static bool IsEven (uint value) { return (value & 1) == 0; }
         public static bool IsEven (float value) { return ((int)value & 1) == 0; }

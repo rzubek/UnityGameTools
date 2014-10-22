@@ -96,5 +96,22 @@ namespace SomaSim.Math
             Assert.IsTrue(MathUtil.Modulus(-3, 3) == 0);
             Assert.IsTrue(MathUtil.Modulus(-4, 3) == 2);
         }
+
+        [TestMethod]
+        public void TestCountIntervals () {
+            Assert.IsTrue(MathUtil.CountIntervals(3, 4, 5) == 0);
+            Assert.IsTrue(MathUtil.CountIntervals(3, 5, 5) == 1);
+            Assert.IsTrue(MathUtil.CountIntervals(5, 9, 5) == 0);
+            Assert.IsTrue(MathUtil.CountIntervals(5, 10, 5) == 1);
+            Assert.IsTrue(MathUtil.CountIntervals(5, 11, 5) == 1);
+            Assert.IsTrue(MathUtil.CountIntervals(3, 10, 5) == 2);
+
+            Assert.IsTrue(MathUtil.CountIntervals(3f, 4.9999f, 5f) == 0);
+            Assert.IsTrue(MathUtil.CountIntervals(3f, 5f, 5f) == 1);
+            Assert.IsTrue(MathUtil.CountIntervals(5f, 9.99f, 5f) == 0);
+            Assert.IsTrue(MathUtil.CountIntervals(5f, 10f, 5f) == 1);
+            Assert.IsTrue(MathUtil.CountIntervals(5f, 11f, 5f) == 1);
+            Assert.IsTrue(MathUtil.CountIntervals(3f, 10f, 5f) == 2);
+        }
     }
 }
