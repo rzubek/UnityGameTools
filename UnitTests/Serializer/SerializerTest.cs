@@ -262,5 +262,30 @@ namespace SomaSim.Serializer
             Assert.IsTrue(target.tHashtable["instance"] is TestData);
             Assert.IsTrue((target.tHashtable["instance"] as TestData).name == "foo");
         }
+
+        [TestMethod]
+        public void TestShorthandDeserializer () {
+            string test = @"
+                {
+                    ""tHashtable"": {
+                        ""instance"": ""_ test-data name foo buy 42 sell true ""
+                    }
+                }";
+
+            Serializer serializer = new Serializer();
+            serializer.Initialize();
+
+            serializer.AddImplicitNamespace("SomaSim.Serializer.SerializerTest");
+
+            Hashtable jsonobj = JSON.JsonDecode(test) as Hashtable;
+            Test target = serializer.Deserialize<Test>(jsonobj);
+
+            Assert.IsTrue(target.tHashtable != null);
+            Assert.IsTrue(target.tHashtable["instance"] != null);
+            Assert.IsTrue(target.tHashtable["instance"] is TestData);
+            Assert.IsTrue((target.tHashtable["instance"] as TestData).name == "foo");
+            Assert.IsTrue((target.tHashtable["instance"] as TestData).buy == 42);
+            Assert.IsTrue((target.tHashtable["instance"] as TestData).sell);
+        }
     }
 }
