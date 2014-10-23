@@ -235,5 +235,32 @@ namespace SomaSim.Serializer
             serializer.Release();
         }
 
+        [TestMethod]
+        public void TestDeserializingImplicitNamespaces () {
+            string test = @"
+                {
+                    ""tHashtable"": {
+                        ""foo"": ""bar"",
+                        ""x"": 1,
+                        ""instance"": {
+                            ""#type"": ""TestData"",
+                            ""name"": ""foo""
+                        }
+                    }
+                }";
+
+            Serializer serializer = new Serializer();
+            serializer.Initialize();
+
+            serializer.AddImplicitNamespace("SomaSim.Serializer.SerializerTest");
+
+            Hashtable jsonobj = JSON.JsonDecode(test) as Hashtable;
+            Test target = serializer.Deserialize<Test>(jsonobj);
+
+            Assert.IsTrue(target.tHashtable != null);
+            Assert.IsTrue(target.tHashtable["instance"] != null);
+            Assert.IsTrue(target.tHashtable["instance"] is TestData);
+            Assert.IsTrue((target.tHashtable["instance"] as TestData).name == "foo");
+        }
     }
 }

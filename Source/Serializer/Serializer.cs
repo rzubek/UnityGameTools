@@ -47,17 +47,29 @@ namespace SomaSim.Serializer
         /// </summary>
         public bool ThrowErrorOnUnexpectedCollections = true;
 
+        /// <summary>
+        /// In the case deserializer finds a "#type" annotation that doesn't correspond to 
+        /// any known type, if this is true, an exception will be thrown; otherwise 
+        /// the object will be deserialized as null.
+        /// </summary>
+        public bool ThrowErrorOnUnknownTypes = true;
+
         private Dictionary<string, Type> _ExplicitlyNamedTypes;
         private Dictionary<Type, object> _DefaultInstances;
         private Dictionary<Type, Func<object>> _InstanceFactories;
+        private List<string> _ImplicitNamespaces;
 
         public void Initialize () {
             this._ExplicitlyNamedTypes = new Dictionary<string, Type>();
             this._DefaultInstances = new Dictionary<Type, object>();
             this._InstanceFactories = new Dictionary<Type, Func<object>>();
+            this._ImplicitNamespaces = new List<string>();
         }
 
         public void Release () {
+            this._ImplicitNamespaces.Clear();
+            this._ImplicitNamespaces = null;
+
             this._InstanceFactories.Clear();
             this._InstanceFactories = null;
 
@@ -323,13 +335,34 @@ namespace SomaSim.Serializer
             }
 
             // search for it the hard way
+            Type type = FindTypeIncludingImplicits(name, ignoreCase);
+            if (type != null) {
+                if (cache) {
+                    this._ExplicitlyNamedTypes[name] = type;
+                }
+                return type;
+            }
+
+            if (ThrowErrorOnUnknownTypes) {
+                throw new Exception("Serializer could not find type information for " + name);
+            }
+
+            return null;
+        }
+
+        private Type FindTypeIncludingImplicits (string name, bool ignoreCase) {
             Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
-            foreach (var assembly in assemblies) {
-                Type type = assembly.GetType(name, false, ignoreCase);
+            
+            // first try to find based on explicit name
+            Type type = FindInAllAssemblies(name, ignoreCase, assemblies);
+            if (type != null) {
+                return type;
+            }
+
+            // otherwise try all implicit namespaces in order
+            foreach (string implicitNamespace in _ImplicitNamespaces) {
+                type = FindInAllAssemblies(implicitNamespace + "+" + name, ignoreCase, assemblies);
                 if (type != null) {
-                    if (cache) {
-                        this._ExplicitlyNamedTypes[name] = type;
-                    }
                     return type;
                 }
             }
@@ -337,20 +370,35 @@ namespace SomaSim.Serializer
             return null;
         }
 
-        private Type InferType (object value) {
-            if (value is Hashtable) {
-                var table = value as Hashtable;
-
-                // see if we have the magical type marker
-                if (table.ContainsKey(TYPEKEY)) {
-                    // manufacture the type
-                    string typestring = table[TYPEKEY] as string;
-                    return FindTypeByName(typestring);
-                } else {
-                    // it's a dictionary
-                    return typeof(Hashtable);
+        private Type FindInAllAssemblies (string name, bool ignoreCase, Assembly[] assemblies) {
+            foreach (var assembly in assemblies) {
+                Type type = assembly.GetType(name, false, ignoreCase);
+                if (type != null) {
+                    return type;
                 }
-            } else if (value is ArrayList) {
+            }
+            return null;
+        }
+
+        private Type InferType (object value) {
+            var table = value as Hashtable;
+
+            // if it's a hashtable, see if we have the magical type marker
+            if (table != null && table.ContainsKey(TYPEKEY)) {
+                // manufacture the type
+                string typeName = table[TYPEKEY] as string;
+                Type explicitType = FindTypeByName(typeName);
+                if (explicitType != null) {
+                    return explicitType;
+                }
+            } 
+            
+            if (table != null) {
+                // either the type wasn't specified, or it's unknown. treat it as a dictionary
+                return typeof(Hashtable);
+            } 
+            
+            if (value is ArrayList) {
                 return typeof(ArrayList);
             }
 
@@ -404,6 +452,20 @@ namespace SomaSim.Serializer
             } else {
                 return Activator.CreateInstance(type);
             }
+        }
+
+        //
+        //
+        // IMPLICIT NAMESPACES
+
+        public void AddImplicitNamespace (string namespacePrefix) {
+            if (! _ImplicitNamespaces.Contains(namespacePrefix)) {
+                _ImplicitNamespaces.Add(namespacePrefix);
+            }
+        }
+
+        public void RemoveImplicitNamespace (string namespacePrefix) {
+            _ImplicitNamespaces.Remove(namespacePrefix);
         }
     }
 }
