@@ -63,16 +63,21 @@ namespace SomaSim.Serializer
         /// </summary>
         public bool EnableShorthandSyntax = true;
 
+        internal struct NSDef {
+            public string prefix;
+            public bool isclass;
+        }
+
         private Dictionary<string, Type> _ExplicitlyNamedTypes;
         private Dictionary<Type, object> _DefaultInstances;
         private Dictionary<Type, Func<object>> _InstanceFactories;
-        private List<string> _ImplicitNamespaces;
+        private List<NSDef> _ImplicitNamespaces;
 
         public void Initialize () {
             this._ExplicitlyNamedTypes = new Dictionary<string, Type>();
             this._DefaultInstances = new Dictionary<Type, object>();
             this._InstanceFactories = new Dictionary<Type, Func<object>>();
-            this._ImplicitNamespaces = new List<string>();
+            this._ImplicitNamespaces = new List<NSDef>();
         }
 
         public void Release () {
@@ -377,8 +382,9 @@ namespace SomaSim.Serializer
             }
 
             // otherwise try all implicit namespaces in order
-            foreach (string implicitNamespace in _ImplicitNamespaces) {
-                type = FindInAllAssemblies(implicitNamespace + "+" + name, ignoreCase, assemblies);
+            foreach (NSDef def in _ImplicitNamespaces) {
+                string longName = def.prefix + (def.isclass ? "+" : ".") + name;
+                type = FindInAllAssemblies(longName, ignoreCase, assemblies);
                 if (type != null) {
                     return type;
                 }
@@ -475,14 +481,12 @@ namespace SomaSim.Serializer
         //
         // IMPLICIT NAMESPACES
 
-        public void AddImplicitNamespace (string namespacePrefix) {
-            if (! _ImplicitNamespaces.Contains(namespacePrefix)) {
-                _ImplicitNamespaces.Add(namespacePrefix);
-            }
+        public void AddImplicitNamespace (string prefix, bool isNamespace = true) {
+            _ImplicitNamespaces.Add(new NSDef() { prefix = prefix, isclass = !isNamespace });
         }
 
-        public void RemoveImplicitNamespace (string namespacePrefix) {
-            _ImplicitNamespaces.Remove(namespacePrefix);
+        public void RemoveImplicitNamespace (string prefix) {
+            _ImplicitNamespaces.RemoveAll((NSDef def) => def.prefix == prefix);
         }
 
 

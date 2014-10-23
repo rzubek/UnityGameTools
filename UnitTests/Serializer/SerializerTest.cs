@@ -252,7 +252,7 @@ namespace SomaSim.Serializer
             Serializer serializer = new Serializer();
             serializer.Initialize();
 
-            serializer.AddImplicitNamespace("SomaSim.Serializer.SerializerTest");
+            serializer.AddImplicitNamespace("SomaSim.Serializer.SerializerTest", false); // false because it's an enclosing class, not a namespace!
 
             Hashtable jsonobj = JSON.JsonDecode(test) as Hashtable;
             Test target = serializer.Deserialize<Test>(jsonobj);
@@ -275,7 +275,7 @@ namespace SomaSim.Serializer
             Serializer serializer = new Serializer();
             serializer.Initialize();
 
-            serializer.AddImplicitNamespace("SomaSim.Serializer.SerializerTest");
+            serializer.AddImplicitNamespace("SomaSim.Serializer.SerializerTest", false);
 
             Hashtable jsonobj = JSON.JsonDecode(test) as Hashtable;
             Test target = serializer.Deserialize<Test>(jsonobj);
