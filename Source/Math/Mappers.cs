@@ -22,6 +22,12 @@ namespace SomaSim.Math
         public List<T> y = new List<T>();
 
         /// <summary>
+        /// Returns true if this mapper is empty, ie. contains no data points, and cannot be used.
+        /// </summary>
+        /// <returns></returns>
+        public bool IsEmpty { get { return x.Count == 0 || y.Count == 0; } }
+
+        /// <summary>
         /// Given some input x value, find an appropriate y value given 
         /// the piecewise linear function, interpolating between points as needed.
         /// This function is linear in the number of points in the function.
@@ -29,7 +35,7 @@ namespace SomaSim.Math
         /// <param name="input"></param>
         /// <returns></returns>
         public T Eval (float input) {
-            if (x.Count == 0 || x.Count != y.Count) {
+            if (IsEmpty || x.Count != y.Count) {
                 throw new Exception("Number mapping definition invalid");
             }
 
