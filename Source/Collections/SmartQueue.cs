@@ -201,7 +201,7 @@ namespace SomaSim.Collections
 
         /// <inheritDoc />
         public object SyncRoot {
-            get { throw new NotImplementedException(); }
+            get { return this; }
         }
 
         /// <inheritDoc />
