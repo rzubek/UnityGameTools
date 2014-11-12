@@ -82,7 +82,7 @@ namespace SomaSim.Math
     {
         public void InitFromHexStrings (List<float> xs, List<string> colors) {
             this.x = xs;
-            this.y = colors.Select(ColorUtil.HexToColor).ToList();
+            this.y = colors.Select<string,Color32>(ColorUtil.HexToColor).ToList();
         }
 
         /// <inheritDoc/>

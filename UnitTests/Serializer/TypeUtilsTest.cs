@@ -1,5 +1,4 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace SomaSim.Serializer
 {
@@ -9,7 +8,7 @@ namespace SomaSim.Serializer
     public class Baz { };
     public struct Struct { };
 
-    public class TestClass
+    public class Data
     {
         public Foo foo;
         public Bar bar;
@@ -17,7 +16,7 @@ namespace SomaSim.Serializer
         public double d;
         public int i;
         public Struct s;
-        public TestClass tc;
+        public Data tc;
 
         public Foo fooFunction () { return null; }
         public Baz bazFunction () { return null; }
@@ -28,7 +27,7 @@ namespace SomaSim.Serializer
     {
         [TestMethod]
         public void TestGetFieldsByType () {
-            var tc = new TestClass();
+            var tc = new Data();
             var fields = TypeUtils.GetMembersByType<FooBar>(tc);
             Assert.IsTrue(fields.Count == 2); // just foo and bar
 
@@ -38,7 +37,7 @@ namespace SomaSim.Serializer
 
         [TestMethod]
         public void TestSetValueByType () {
-            var tc = new TestClass();
+            var tc = new Data();
             Assert.IsNull(tc.bar);
             TypeUtils.SetValueByType(tc, new Bar());
             Assert.IsNotNull(tc.bar);
@@ -48,7 +47,7 @@ namespace SomaSim.Serializer
 
         [TestMethod]
         public void TestMakeAndRemoveFieldsByType () {
-            var tc = new TestClass();
+            var tc = new Data();
 
             TypeUtils.MakeMemberInstances<FooBar>(tc);
             Assert.IsInstanceOfType(tc.foo, typeof(Foo));
