@@ -148,6 +148,7 @@ namespace SomaSim.Collections
 
             // now pop e2 from the tail, make sure it never got activated or deactivated
             var popped = q.PopTail();
+            Assert.IsTrue(popped == e2);
             Assert.IsTrue(q.Head == e1 && q.Tail == e1 && q.Count == 1);
             Assert.IsFalse(e2.IsEnqueued);
             Assert.IsFalse(e2.IsHead);
