@@ -350,6 +350,12 @@ namespace SomaSim.Serializer
         }
 
         private Type FindTypeByName (string name, bool ignoreCase = false, bool cache = true) {
+            // see if we need to convert from shorthand notation or not 
+            if (name.Contains("-"))
+            {
+                name = MakeCamelCaseTypeName(name);
+            }
+
             // do we have it cached?
             Type result = null;
             if (_ExplicitlyNamedTypes.TryGetValue(name, out result)) {
@@ -501,7 +507,7 @@ namespace SomaSim.Serializer
             var tokens = new Queue<string>(value.Substring(2).Trim().Split());
 
             // first token must be the type name
-            result[TYPEKEY] = MakeTypeName(tokens.Dequeue());
+            result[TYPEKEY] = tokens.Dequeue();
 
             // now peel off key value pairs
             while (tokens.Count >= 2) {
@@ -524,7 +530,7 @@ namespace SomaSim.Serializer
             return value;
         }
 
-        private string MakeTypeName (string name) {
+        private string MakeCamelCaseTypeName (string name) {
             // split on dash, capitalize each segment, then squish back together
             string[] segments = name.Split('-');
             for (int i = 0; i < segments.Length; ++i) { segments[i] = UpcaseFirstLetter(segments[i]); }
