@@ -2,7 +2,9 @@
 bin/
 obj/
 
-# No meta files for source code plz kthxbai
+# No meta files for source code plz kthxbai...
 *.meta
 */*.meta
 
+# ...except for components
+!/Source/Testing/UnitTestRunner.cs.meta
