@@ -2,3 +2,7 @@
 bin/
 obj/
 
+# No meta files for source code plz kthxbai
+*.meta
+*/*.meta
+
