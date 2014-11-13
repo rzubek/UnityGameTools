@@ -11,24 +11,28 @@ namespace SomaSim
         public void Start () {
             System.Diagnostics.Stopwatch timer = new System.Diagnostics.Stopwatch();
             timer.Start();
-            RunUnitTests();
+            int count = RunUnitTests();
             timer.Stop();
-            Debug.Log("Unit tests ran in " + timer.Elapsed.TotalSeconds + " seconds");
+            Debug.Log("Unit tests: " + count + " tests ran in " + timer.Elapsed.TotalSeconds + " seconds");
         }
 
-        private void RunUnitTests () {
+        private int RunUnitTests () {
+            int sum = 0;
             foreach (Type testClass in GetTestClasses()) {
-                var instance = Activator.CreateInstance(testClass);
-                RunTestMethods(instance);
+                sum += RunTestMethods(Activator.CreateInstance(testClass));
             }
+            return sum;
         }
 
-        private void RunTestMethods (object testInstance) {
+        private int RunTestMethods (object testInstance) {
+            int sum = 0;
             foreach (MethodInfo method in testInstance.GetType().GetMethods()) {
                 if (method.GetCustomAttributes(typeof(TestMethod), true).Length > 0) {
                     method.Invoke(testInstance, null);
+                    sum++;
                 }
             }
+            return sum;
         }
 
         private static IEnumerable<Type> GetTestClasses () {
