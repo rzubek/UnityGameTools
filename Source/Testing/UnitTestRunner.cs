@@ -35,7 +35,7 @@ namespace SomaSim
                     } catch (UnitTestException e) {
                         Debug.LogError("UNIT TEST FAILURE in " + method.ToString() + "\n" + e.Message + "\n" + e.StackTrace);
                     } catch (Exception e) {
-                        Debug.LogError("UNIT TEST ERROR in " + method.ToString() + "\n" + e.Message + "\n" + e.StackTrace);
+                        Debug.LogError("UNIT TEST ERROR in " + method.ToString() + "\n" + e.InnerException);
                     }
                 }
             }
