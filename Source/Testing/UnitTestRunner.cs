@@ -28,8 +28,15 @@ namespace SomaSim
             int sum = 0;
             foreach (MethodInfo method in testInstance.GetType().GetMethods()) {
                 if (method.GetCustomAttributes(typeof(TestMethod), true).Length > 0) {
-                    method.Invoke(testInstance, null);
                     sum++;
+
+                    try {
+                        method.Invoke(testInstance, null);
+                    } catch (UnitTestException e) {
+                        Debug.LogError("UNIT TEST FAILURE in " + method.ToString() + "\n" + e.Message + "\n" + e.StackTrace);
+                    } catch (Exception e) {
+                        Debug.LogError("UNIT TEST ERROR in " + method.ToString() + "\n" + e.Message + "\n" + e.StackTrace);
+                    }
                 }
             }
             return sum;
