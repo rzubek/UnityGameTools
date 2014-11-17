@@ -130,6 +130,15 @@ namespace SomaSim.Serializer
                 }
             }
 
+            // enums get converted from a number value, or parsed by name from a string
+            if (targettype != null && targettype.IsEnum) {
+                if (value is string) {
+                    return Enum.Parse(targettype, (string)value, true);
+                } else {
+                    return Enum.ToObject(targettype, Convert.ToInt32((double)value));
+                }
+            }
+
             // scalars get simply converted (if needed)
             if (IsScalar(value)) {
                 return (targettype != null) ? Convert.ChangeType(value, targettype) : value;
@@ -263,6 +272,11 @@ namespace SomaSim.Serializer
             // booleans and strings get returned as is
             if (value is Boolean || value is String) {
                 return value;
+            }
+
+            // enums get converted to their number value and saved out as int
+            if (type.IsEnum) {
+                return (int)value;
             }
 
             // numeric types and chars get converted to either a double or an int

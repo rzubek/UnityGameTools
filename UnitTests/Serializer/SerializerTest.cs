@@ -12,6 +12,7 @@ namespace SomaSim.Serializer
             ""ti"": 1,
             ""td"": 3.141,
             ""tstr"": ""This is a test string"",
+            ""te"": ""valueofone"",
 
             ""tHashtable"": {
                 ""foo"": ""bar"",
@@ -58,6 +59,7 @@ namespace SomaSim.Serializer
             public int ti;
             public double td;
             public string tstr;
+            public TestEnum te;
 
             public ArrayList tArrayList;
             public List<TestData> tTypedList;
@@ -88,6 +90,12 @@ namespace SomaSim.Serializer
             public bool sell;
         }
 
+        public enum TestEnum
+        {
+            ValueOfZero = 0,
+            ValueOfOne = 1
+        }
+
         [TestMethod]
         public void TestDeserialization () {
             Serializer serializer = new Serializer();
@@ -99,6 +107,7 @@ namespace SomaSim.Serializer
             Assert.IsTrue(target.ti == 1);
             Assert.IsTrue(target.td == 3.141);
             Assert.IsTrue(target.tstr == "This is a test string");
+            Assert.IsTrue(target.te == TestEnum.ValueOfOne);
 
             Assert.IsTrue(target.tHashtable.Keys.Count == 3);
             Assert.IsTrue(target.tHashtable["foo"] as String == "bar");
@@ -143,6 +152,7 @@ namespace SomaSim.Serializer
                 source.tstr = "Test String";
                 source.ti = 1;
                 source.td = 3.141;
+                source.te = TestEnum.ValueOfOne;
 
                 source.tHashtable = new Hashtable { { 1, 2 }, { "foo", new TestData { name = "bar" } } };
                 source.tTypedDictionary = new Dictionary<string, double> { { "foo", 1 }, { "bar", 2 } };
@@ -158,7 +168,11 @@ namespace SomaSim.Serializer
 
                 object result = serializer.Serialize(source);
                 Assert.IsTrue(result is Hashtable);
-                Assert.IsTrue(((Hashtable)result).Keys.Count == (skipDefaults ? 10 : 13));
+                Assert.IsTrue(((Hashtable)result).Keys.Count == (skipDefaults ? 11 : 14));
+                Assert.IsTrue((string)((Hashtable)result)["tstr"] == "Test String");
+                Assert.IsTrue((int)((Hashtable)result)["ti"] == 1);
+                Assert.IsTrue((double)((Hashtable)result)["td"] == 3.141);
+                Assert.IsTrue((int)((Hashtable)result)["te"] == 1); // enum gets serialized as its numeric value
 
                 string json = JSON.JsonEncode(result);
                 Assert.IsNotNull(json);
@@ -184,6 +198,8 @@ namespace SomaSim.Serializer
 
             Assert.IsTrue(serialized["tstr"] as String == "Test String");
             Assert.IsTrue(serialized["td"] == null);
+            Assert.IsTrue(serialized["ti"] == null);
+            Assert.IsTrue(serialized["te"] == null);
             Assert.IsTrue((serialized["tTestRecursive"] as Hashtable)["tstr"] as String == "Hello World!");
             Assert.IsTrue(((serialized["tTypedDictOfData"] as Hashtable)["foo"] as Hashtable)["name"] as string == "wheat");
 
