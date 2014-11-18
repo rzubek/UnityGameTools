@@ -70,10 +70,20 @@ namespace SomaSim.Utils
             // allocate a new instance using this custom factory, make sure the factory code got called
             var e1 = pool.Allocate();
             Assert.IsTrue(e1.value == 42);
+            Assert.IsTrue(pool.UsedListSize == 1);
+            Assert.IsTrue(pool.FreeListSize == 0);
 
-            // now release the entire object pool, make sure the element got reset
+            // allocate and free an instance. this will grow the pool to size one
+            pool.Free(pool.Allocate());
+            Assert.IsTrue(pool.UsedListSize == 1);
+            Assert.IsTrue(pool.FreeListSize == 1);
+
+            // now release the entire object pool. this will clear out the free list, but will not
+            // affect the object already in circulation, since we're not tracking them.
             pool.Release();
-            Assert.IsTrue(e1.value == 0);
+            Assert.IsTrue(e1.value == 42);
+            Assert.IsTrue(pool.UsedListSize == 1);
+            Assert.IsTrue(pool.FreeListSize == -1);
         }
     }
 }

@@ -31,17 +31,17 @@ namespace SomaSim.Utils
         private Func<T> _factory;
 
         /// <summary>
-        /// List of all entires already in circulation
-        /// </summary>
-        private List<T> _used;
-
-        /// <summary>
         /// List of all entries returned from circulation, and ready for reuse.
         /// </summary>
         private Stack<T> _free;
 
-        public int UsedListSize { get { return _used.Count; } }
-        public int FreeListSize { get { return _free.Count; } }
+        /// <summary>
+        /// Number of elements currently in circulation, that haven't been returned.
+        /// </summary>
+        private int _usedcount;
+
+        public int UsedListSize { get { return _usedcount; } }
+        public int FreeListSize { get { return _free != null ? _free.Count : -1; } }
 
         /// <summary>
         /// Initializes the object pool.
@@ -57,7 +57,6 @@ namespace SomaSim.Utils
         /// <param name="factory"></param>
         public void Initialize (Func<T> factory) {
             _factory = factory;
-            _used = new List<T>();
             _free = new Stack<T>();
         }
 
@@ -65,12 +64,6 @@ namespace SomaSim.Utils
         /// Releases all elements and resources held by this pool.
         /// </summary>
         public void Release () {
-            while (_used.Count > 0) {
-                Free(_used[0]);
-            }
-
-            _used.Clear();
-            _used = null;
             _free.Clear();
             _free = null;
             _factory = null;
@@ -83,7 +76,7 @@ namespace SomaSim.Utils
         /// <returns></returns>
         public T Allocate () {
             T element = (_free.Count > 0) ? _free.Pop() : _factory.Invoke();
-            _used.Add(element);
+            _usedcount++;
             return element;
         }
 
@@ -93,7 +86,7 @@ namespace SomaSim.Utils
         /// <param name="element"></param>
         public void Free (T element) {
             element.Reset();
-            _used.Remove(element);
+            _usedcount--;
             _free.Push(element);
         }
     }
