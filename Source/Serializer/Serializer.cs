@@ -122,6 +122,11 @@ namespace SomaSim.Serializer
                 targettype = null;
             }
 
+            // return nulls as nulls
+            if (value == null) {
+                return null;
+            }
+
             // check for shorthand syntax real quick
             if (EnableShorthandSyntax) {
                 string stringvalue = value as string;
@@ -135,11 +140,15 @@ namespace SomaSim.Serializer
                 if (value is string) {
                     return Enum.Parse(targettype, (string)value, true);
                 } else {
-                    return Enum.ToObject(targettype, Convert.ToInt32((double)value));
+                    int enumValue = Convert.ToInt32(value);
+                    return Enum.ToObject(targettype, enumValue);
                 }
             }
 
             // scalars get simply converted (if needed)
+            if (targettype != null && targettype.IsPrimitive) {
+                return Convert.ChangeType(value, targettype);
+            }
             if (IsScalar(value)) {
                 return (targettype != null) ? Convert.ChangeType(value, targettype) : value;
             }
@@ -276,7 +285,7 @@ namespace SomaSim.Serializer
 
             // enums get converted to their number value and saved out as int
             if (type.IsEnum) {
-                return (int)value;
+                return Convert.ToInt32(value);
             }
 
             // numeric types and chars get converted to either a double or an int
@@ -359,8 +368,18 @@ namespace SomaSim.Serializer
         //
         // HELPERS
 
+        public T Clone<T> (T value) {
+            return (T)Clone(value, typeof(T));
+        }
+
+        public object Clone (object value, Type targetType) {
+            object temp = Serialize(value);
+            return Deserialize(temp, targetType);
+        }
+
         private bool IsScalar (object value) {
-            return value is Double || value is Boolean || value is String;
+            // same types as the primitives written out in serialize()
+            return value is Int32 || value is Double || value is Boolean || value is String;
         }
 
         private Type FindTypeByName (string name, bool ignoreCase = false, bool cache = true) {

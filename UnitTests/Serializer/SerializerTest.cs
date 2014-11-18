@@ -251,6 +251,49 @@ namespace SomaSim.Serializer
         }
 
         [TestMethod]
+        public void TestClone () {
+            foreach (bool skipDefaults in new bool[] { true, false }) {
+                Serializer serializer = new Serializer();
+                serializer.Initialize();
+                serializer.SkipDefaultsDuringSerialization = skipDefaults;
+
+                Test source = new Test();
+                source.tstr = "Test String";
+                source.ti = 1;
+                source.td = 3.141;
+                source.te = TestEnum.ValueOfOne;
+
+                source.tHashtable = new Hashtable { { 1, 2 }, { "foo", new TestData { name = "bar" } } };
+                source.tTypedDictionary = new Dictionary<string, double> { { "foo", 1 }, { "bar", 2 } };
+                source.tTypedDictOfData = new Dictionary<string, TestData> { { "foo", new TestData { name = "wheat" } } };
+
+                source.tArrayList = new ArrayList { 1, 2, "foo", true, new TestData { name = "wheat" } };
+                source.tTypedList = new List<TestData> { new TestData { name = "wheat" }, new TestData { name = "bread" } };
+
+                source.tTestRecursive = new Test();
+                source.tTestRecursive.tstr = "Hello World!";
+
+                Test target = serializer.Clone(source);
+                Assert.IsTrue(target != source);
+                Assert.IsTrue(source.tstr == target.tstr);
+                Assert.IsTrue(source.ti == target.ti);
+                Assert.IsTrue(source.td == target.td);
+                Assert.IsTrue(source.te == target.te);
+                
+                Assert.IsTrue(source.tHashtable != target.tHashtable);
+                Assert.IsTrue(source.tHashtable.Count == target.tHashtable.Count);
+                Assert.IsTrue((int)(source.tHashtable[1]) == (int)(target.tHashtable[1]));
+                Assert.IsTrue(((TestData)(source.tHashtable["foo"])).name == ((TestData)(target.tHashtable["foo"])).name);
+
+                Assert.IsTrue(source.tArrayList.Count == target.tArrayList.Count);
+                Assert.IsTrue(source.tTypedList.Count == target.tTypedList.Count);
+                Assert.IsTrue(source.tTypedList[0].name == target.tTypedList[0].name);
+
+                serializer.Release();
+            }
+        }
+
+        [TestMethod]
         public void TestDeserializingImplicitNamespaces () {
             string test = @"
                 {
