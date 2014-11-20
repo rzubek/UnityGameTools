@@ -154,7 +154,7 @@ namespace SomaSim.Serializer
             }
 
             // try to infer type from the value if it's a dictionary with a #type key
-            if (targettype == null) {
+            if (targettype == null || IsExplicitlyTypedHashtable(value)) {
                 targettype = InferType(value);
             }
 
@@ -442,11 +442,16 @@ namespace SomaSim.Serializer
             return null;
         }
 
+        private bool IsExplicitlyTypedHashtable (object value) {
+            var table = value as Hashtable;
+            return table != null && table.ContainsKey(TYPEKEY);
+        }
+
         private Type InferType (object value) {
             var table = value as Hashtable;
 
             // if it's a hashtable, see if we have the magical type marker
-            if (table != null && table.ContainsKey(TYPEKEY)) {
+            if (IsExplicitlyTypedHashtable(value)) {
                 // manufacture the type
                 string typeName = table[TYPEKEY] as string;
                 Type explicitType = FindTypeByName(typeName);

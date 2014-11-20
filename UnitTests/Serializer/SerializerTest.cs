@@ -35,9 +35,10 @@ namespace SomaSim.Serializer
                 1, 2, ""foo"", true
             ],
 		    ""tTypedList"": [
-			    { ""name"": ""wheat"",  		""buy"": 10,	""sell"": true },
-			    { ""name"": ""barley"",  		""buy"": 11,	""sell"": false },
-			    { ""name"": ""cottom"",  		""buy"": 12,	""sell"": true }
+			    { ""name"": ""wheat"",  ""buy"": 10, ""sell"": true },
+			    { ""name"": ""barley"", ""buy"": 11, ""sell"": false },
+			    { ""#type"": ""SomaSim.Serializer.SerializerTest+TestSubData"",
+                  ""name"": ""cotton"", ""buy"": 12, ""sell"": true, ""subname"": ""fancy"" }
             ],
 
             ""tStruct"": {
@@ -88,6 +89,11 @@ namespace SomaSim.Serializer
             public string name;
             public int buy;
             public bool sell;
+        }
+
+        public class TestSubData : TestData
+        {
+            public string subname;
         }
 
         public enum TestEnum
@@ -159,7 +165,7 @@ namespace SomaSim.Serializer
                 source.tTypedDictOfData = new Dictionary<string, TestData> { { "foo", new TestData { name = "wheat" } } };
 
                 source.tArrayList = new ArrayList { 1, 2, "foo", true, new TestData { name = "wheat" } };
-                source.tTypedList = new List<TestData> { new TestData { name = "wheat" }, new TestData { name = "bread" } };
+                source.tTypedList = new List<TestData> { new TestData { name = "wheat" }, new TestSubData { name = "bread", subname = "wheat" } };
 
                 source.tTestRecursive = new Test();
                 source.tTestRecursive.tstr = "Hello World!";
