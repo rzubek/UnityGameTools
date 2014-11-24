@@ -47,22 +47,22 @@ namespace SomaSim.Collections
 
         /// <inheritDoc />
         virtual public void OnPushed (object stack) {
-            this.Stack = stack;
+            if (!IsOnStack) { this.Stack = stack; } else { throw new InvalidOperationException("Failed to double-push a smart stack element"); }
         }
 
         /// <inheritDoc />
         virtual public void OnActivated () {
-            this.IsActive = true;
+            if (IsOnStack) { this.IsActive = true; } else { throw new InvalidOperationException("Only elements on the stack can be activated"); }
         }
 
         /// <inheritDoc />
         virtual public void OnDeactivated () {
-            this.IsActive = false;
+            if (IsOnStack) { this.IsActive = false; } else { throw new InvalidOperationException("Only elements on the stack can be deactivated"); }
         }
 
         /// <inheritDoc />
         virtual public void OnPopped () {
-            this.Stack = null;
+            if (IsOnStack) { this.Stack = null; } else { throw new InvalidOperationException("Only elements on the stack can be popped"); }
         }
     }
 
@@ -79,7 +79,7 @@ namespace SomaSim.Collections
         /// <summary>
         /// Returns true if the stack is empty
         /// </summary>
-        public bool Empty { get { return _stack.Count == 0; } }
+        public bool IsEmpty { get { return _stack.Count == 0; } }
 
         /// <summary>
         /// Pushes a new element onto the stack and activates it as the topmost one.
@@ -87,7 +87,7 @@ namespace SomaSim.Collections
         /// </summary>
         /// <param name="element"></param>
         public void Push (T element) {
-            if (!Empty) {
+            if (!IsEmpty) {
                 T top = _stack.Peek();
                 top.OnDeactivated();
             }
@@ -103,7 +103,7 @@ namespace SomaSim.Collections
         /// </summary>
         /// <returns></returns>
         public T Pop () {
-            if (Empty) {
+            if (IsEmpty) {
                 return null;
             }
 
@@ -112,7 +112,7 @@ namespace SomaSim.Collections
             old.OnPopped();
             _stack.Pop();
 
-            if (!Empty) {
+            if (!IsEmpty) {
                 T top = _stack.Peek();
                 top.OnActivated();
             }
@@ -125,7 +125,7 @@ namespace SomaSim.Collections
         /// </summary>
         /// <returns></returns>
         public T Peek () {
-            return Empty ? null : _stack.Peek();
+            return IsEmpty ? null : _stack.Peek();
         }
 
         /// <summary>

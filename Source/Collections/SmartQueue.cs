@@ -44,27 +44,27 @@ namespace SomaSim.Collections
     abstract public class AbstractSmartQueueElement : ISmartQueueElement
     {
         public object Queue { get; private set; }
-        public bool IsHead { get; private set; }
+        public bool IsActive { get; private set; }
         public bool IsEnqueued { get { return Queue != null; } }
 
         /// <inheritDoc />
         virtual public void OnEnqueued (object queue) {
-            this.Queue = queue;
+            if (!IsEnqueued) { this.Queue = queue; } else { throw new InvalidOperationException("Failed to double-enqueue a smart queue element"); }
         }
 
         /// <inheritDoc />
         virtual public void OnActivated () {
-            this.IsHead = true;
+            if (IsEnqueued) { this.IsActive = true; } else { throw new InvalidOperationException("Only enqueued elements can be activated"); }
         }
 
         /// <inheritDoc />
         virtual public void OnDeactivated (bool pushedback) {
-            this.IsHead = false;
+            if (IsEnqueued) { this.IsActive = false; } else { throw new InvalidOperationException("Only enqueued elements can be deactivated"); }
         }
 
         /// <inheritDoc />
         virtual public void OnDequeued (bool poppedtail) {
-            this.Queue = null;
+            if (IsEnqueued) { this.Queue = null; } else { throw new InvalidOperationException("Failed to dequeue a smart queue element that wasn't in the queue"); }
         }
     }
 
@@ -81,7 +81,7 @@ namespace SomaSim.Collections
         /// <summary>
         /// Returns true if the queue is empty
         /// </summary>
-        public bool Empty { get { return _queue.Count == 0; } }
+        public bool IsEmpty { get { return _queue.Count == 0; } }
 
         /// <summary>
         /// Adds a new element to the end of the queue. If it's the only element,
@@ -98,12 +98,24 @@ namespace SomaSim.Collections
         }
 
         /// <summary>
+        /// Adds a collection of new elements to the end of the queue.
+        /// If the queue was previously empty, the first element will be activated 
+        /// when it's pushed.
+        /// </summary>
+        /// <param name="elements"></param>
+        public void Enqueue (IEnumerable<T> elements) {
+            foreach (T element in elements) {
+                Enqueue(element);
+            }
+        }
+
+        /// <summary>
         /// Adds a new element to the front of the queue, automatically making it
         /// the head of the queue, and deactivating the previous one if it existed.
         /// </summary>
         /// <param name="element"></param>
         public void PushHead (T element) {
-            if (!Empty) {
+            if (!IsEmpty) {
                 T head = _queue.First.Value;
                 head.OnDeactivated(true);
             }
@@ -119,7 +131,7 @@ namespace SomaSim.Collections
         /// </summary>
         /// <returns></returns>
         public T Dequeue () {
-            if (Empty) {
+            if (IsEmpty) {
                 return null;
             }
 
@@ -128,7 +140,7 @@ namespace SomaSim.Collections
             head.OnDequeued(false);
             _queue.RemoveFirst();
 
-            if (!Empty) {
+            if (!IsEmpty) {
                 _queue.First.Value.OnActivated();
             }
 
@@ -141,7 +153,7 @@ namespace SomaSim.Collections
         /// </summary>
         /// <returns></returns>
         public T PopTail () {
-            if (Empty) {
+            if (IsEmpty) {
                 return null;
             }
 
@@ -160,13 +172,13 @@ namespace SomaSim.Collections
         /// Returns the head element on the queue without removing it, or null if empty.
         /// </summary>
         /// <returns></returns>
-        public T Head { get { return Empty ? null : _queue.First.Value; } }
+        public T Head { get { return IsEmpty ? null : _queue.First.Value; } }
 
         /// <summary>
         /// Returns the tail element of the queue without removing it, or null if empty.
         /// </summary>
         /// <returns></returns>
-        public T Tail { get { return Empty ? null : _queue.Last.Value; } }
+        public T Tail { get { return IsEmpty ? null : _queue.Last.Value; } }
 
         #region IEnumerable Members
 

@@ -39,7 +39,7 @@ namespace SomaSim.Collections
         public void TestSmartStack () {
 
             SmartStack<TestEntry> stack = new SmartStack<TestEntry>();
-            Assert.IsTrue(stack.Empty && stack.Count == 0 && stack.Peek() == null);
+            Assert.IsTrue(stack.IsEmpty && stack.Count == 0 && stack.Peek() == null);
 
             // make an empty something
             TestEntry e1 = new TestEntry();
@@ -50,7 +50,7 @@ namespace SomaSim.Collections
 
             // push it! make sure it's there, and got notified appropriately
             stack.Push(e1);
-            Assert.IsTrue(stack.Peek() == e1 && stack.Count == 1 && !stack.Empty);
+            Assert.IsTrue(stack.Peek() == e1 && stack.Count == 1 && !stack.IsEmpty);
             Assert.IsTrue(e1.pushCount == 1 && e1.activationCount == 1);
             Assert.IsTrue(e1.IsOnStack);
             Assert.IsTrue(e1.IsActive);
@@ -58,7 +58,7 @@ namespace SomaSim.Collections
             // push something else. this should deactivate but not pop the first one
             TestEntry e2 = new TestEntry();
             stack.Push(e2);
-            Assert.IsTrue(stack.Peek() == e2 && stack.Count == 2 && !stack.Empty);
+            Assert.IsTrue(stack.Peek() == e2 && stack.Count == 2 && !stack.IsEmpty);
             Assert.IsTrue(e1.pushCount == 1 && e1.activationCount == 1); // same as before, but
             Assert.IsTrue(e1.IsOnStack);
             Assert.IsFalse(e1.IsActive); // ...this is no longer true
@@ -67,7 +67,7 @@ namespace SomaSim.Collections
             // pop that something else, let's verify e1 is activated 
             var popped = stack.Pop();
             Assert.IsTrue(popped == e2);
-            Assert.IsTrue(stack.Peek() == e1 && stack.Count == 1 && !stack.Empty);
+            Assert.IsTrue(stack.Peek() == e1 && stack.Count == 1 && !stack.IsEmpty);
             Assert.IsTrue(e1.pushCount == 1 && e1.activationCount == 2); // activations incremented
             Assert.IsTrue(e1.deactivationCount == 1); // deactivations unchanged
             Assert.IsTrue(e1.IsActive);
@@ -75,7 +75,7 @@ namespace SomaSim.Collections
             // now pop the last thing
             var popped2 = stack.Pop();
             Assert.IsTrue(popped2 == e1);
-            Assert.IsTrue(stack.Peek() == null && stack.Count == 0 && stack.Empty);
+            Assert.IsTrue(stack.Peek() == null && stack.Count == 0 && stack.IsEmpty);
             Assert.IsTrue(e1.pushCount == 1 && e1.activationCount == 2); // activations unchanged
             Assert.IsTrue(e1.deactivationCount == 2 && e1.popCount == 1); // deactivations and popped incremented
             Assert.IsFalse(e1.IsActive);     // none of these is true anymore
