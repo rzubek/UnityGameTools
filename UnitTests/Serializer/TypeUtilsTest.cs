@@ -33,6 +33,9 @@ namespace SomaSim.Serializer
 
             var fields2 = TypeUtils.GetMembersByType(typeof(FooBar), tc);
             Assert.IsTrue(fields2.Count == 2); // same
+
+            var foofield = TypeUtils.GetMember(tc, "foo");
+            Assert.IsTrue(foofield != null && foofield.Name == "foo");
         }
 
         [TestMethod]

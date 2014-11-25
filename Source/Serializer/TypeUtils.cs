@@ -119,6 +119,18 @@ namespace SomaSim.Serializer
         }
 
         /// <summary>
+        /// Returns the unique serializable field or property with the given name.
+        /// If there are none, or more than one, returns null.
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static MemberInfo GetMember (object obj, string name) {
+            MemberInfo[] members = obj.GetType().GetMember(name);
+            return (members.Length == 1) ? members[0] : null;
+        }
+
+        /// <summary>
         /// Returns all fields or properties from a type descriptor
         /// </summary>
         /// <param name="t"></param>
@@ -140,6 +152,20 @@ namespace SomaSim.Serializer
         public static void MakeMemberInstances<T> (object obj) {
             List<MemberInfo> members = GetMembersByType<T>(obj);
             foreach (MemberInfo member in members) {
+                object instance = Activator.CreateInstance(GetMemberType(member), null);
+                SetValue(member, obj, instance);
+            }
+        }
+
+        /// <summary>
+        /// Given an object and a type T, sets all variables and properties with given name
+        /// to new instances.
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="name"></param>
+        public static void MakeMemberInstances (object obj, string name) {
+            MemberInfo member = GetMember(obj, name);
+            if (member != null) { 
                 object instance = Activator.CreateInstance(GetMemberType(member), null);
                 SetValue(member, obj, instance);
             }
