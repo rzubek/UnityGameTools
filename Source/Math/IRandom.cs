@@ -48,6 +48,26 @@ namespace SomaSim.Math
     }
 
     /// <summary>
+    /// Simple data structure that encapsulates both a range of numbers for a random number generator,
+    /// and the number of passes (one pass to generate a uniform distribution, more passes to
+    /// approximate normal distribution).
+    /// </summary>
+    public class RandomRangeF
+    {
+        public float from;
+        public float to;
+        public byte passes;
+
+        public RandomRangeF () : this(0f, 1f, 1) { }
+
+        public RandomRangeF (float from, float to, byte passes = 1) {
+            this.from = from;
+            this.to = to;
+            this.passes = passes;
+        }
+    }
+
+    /// <summary>
     /// Extension methods for random number generators
     /// </summary>
     public static class RandomExtensions
@@ -74,7 +94,7 @@ namespace SomaSim.Math
         /// <returns></returns>
         public static float Generate (this IRandom rand, float min, float max) {
             uint p = rand.Generate();
-            return p * (max - min) + min;
+            return (1 - p) * min + p * max;
         }
 
         /// <summary>
@@ -86,6 +106,21 @@ namespace SomaSim.Math
         /// <returns></returns>
         public static int Generate (this IRandom rng, RandomRange range) {
             long total = 0;
+            for (int i = 0; i < range.passes; i++) {
+                total += rng.Generate(range.from, range.to);
+            }
+            return (int)(total / range.passes);
+        }
+
+        /// <summary>
+        /// Generates the next random value in the half-open range [range.min, range.max)
+        /// with a distribution specified by the range.passes value.
+        /// </summary>
+        /// <param name="rng"></param>
+        /// <param name="range"></param>
+        /// <returns></returns>
+        public static int Generate (this IRandom rng, RandomRangeF range) {
+            float total = 0f;
             for (int i = 0; i < range.passes; i++) {
                 total += rng.Generate(range.from, range.to);
             }
