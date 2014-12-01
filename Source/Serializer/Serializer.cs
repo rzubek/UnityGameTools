@@ -373,7 +373,7 @@ namespace SomaSim.Serializer
         }
 
         public object Clone (object value, Type targetType) {
-            object temp = Serialize(value);
+            object temp = Serialize(value, true);
             return Deserialize(temp, targetType);
         }
 
