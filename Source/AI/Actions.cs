@@ -126,8 +126,11 @@ namespace SomaSim.AI
         }
 
         public override string ToString () {
-            string elements = (Queue == null || Queue.IsEmpty) ? "(none)" :
-                string.Join(", ", this.Select(action => action.ToString()).ToArray());
+            string elements = string.Join(", ", this.Select(action => action.ToString()).ToArray());
+            if (Queue == null || Queue.IsEmpty) {
+                elements = "(not in queue)" + elements;
+            }
+
             return "Script " + Name + ": " + elements;
         }
     }
