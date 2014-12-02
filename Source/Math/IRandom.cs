@@ -93,7 +93,7 @@ namespace SomaSim.Math
         /// <param name="max"></param>
         /// <returns></returns>
         public static float Generate (this IRandom rand, float min, float max) {
-            uint p = rand.Generate();
+            float p = rand.GenerateFloat();
             return (1 - p) * min + p * max;
         }
 
@@ -119,12 +119,12 @@ namespace SomaSim.Math
         /// <param name="rng"></param>
         /// <param name="range"></param>
         /// <returns></returns>
-        public static int Generate (this IRandom rng, RandomRangeF range) {
+        public static float Generate (this IRandom rng, RandomRangeF range) {
             float total = 0f;
             for (int i = 0; i < range.passes; i++) {
                 total += rng.Generate(range.from, range.to);
             }
-            return (int)(total / range.passes);
+            return (total / range.passes);
         }
 
         /// <summary>
