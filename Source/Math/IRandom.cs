@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SomaSim.Math
 {
@@ -158,6 +159,37 @@ namespace SomaSim.Math
         public static T PickElement<T> (this IRandom rand, IList list) where T : class {
             int index = rand.Generate(0, list.Count);
             return list[index] as T;
+        }
+
+        /// <summary>
+        /// Picks a weighted random element from the first list, with probability based on weights from the second list.
+        /// It's assumed (but not checked) that both lists have the same length.
+        /// 
+        /// Normally this function runs in O(n) in the size of the lists (one pass over each list).
+        /// If the weights list is known to be normalized (all elements add up to one), pass in the normalized
+        /// flag set to true to skip iterating over the weights array to sum it up.
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="rand"></param>
+        /// <param name="list"></param>
+        /// <param name="weights"></param>
+        /// <param name="normalized"></param>
+        /// <returns></returns>
+        public static T PickElement<T> (this IRandom rand, IList<T> list, IList<float> weights, bool normalized = false) where T : class {
+            float sum = normalized ? 1 : weights.Sum();
+            float index = rand.GenerateFloat() * sum;
+            
+            for (int i = 0, count = list.Count; i < count; ++i) {
+                float weight = weights[i];
+                if (index <= weight) {
+                    return list[i];
+                } else {
+                    index -= weight;
+                }
+            }
+
+            return null;
         }
     }
 }
