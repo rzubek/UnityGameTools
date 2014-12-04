@@ -26,9 +26,9 @@ namespace SomaSim.AI
             // no op
         }
 
-        virtual public void Stop () {
+        virtual public void Stop (bool success) {
             if (this.IsEnqueued && this.IsActive) {
-                this.Script.StopCurrentAction();
+                this.Script.StopCurrentAction(success);
 
             } else if (ScriptQueue.DEBUG) {
                 // this action is not running, so something went wrong if someone is calling stop()
@@ -62,7 +62,7 @@ namespace SomaSim.AI
             this.IsActive = true;
             if (IsEmpty) {
                 // if empty, we shouldn't be here, pop ourselves off
-                StopScript();
+                StopScript(true);
             }
         }
 
@@ -80,15 +80,32 @@ namespace SomaSim.AI
         }
 
         /// <summary>
+        /// Adds a single action into the script. If it's the first one, it will be activated immediately.
+        /// </summary>
+        /// <param name="action"></param>
+        new public void Add (Action action) {
+            base.Enqueue(action);
+        }
+
+        /// <summary>
+        /// Adds a list of actions to the script. If the script was empty, the first one will be activated
+        /// immediately, before subsequent ones are added.
+        /// </summary>
+        /// <param name="actions"></param>
+        public void Add (IEnumerable<Action> actions) {
+            base.Enqueue(actions);
+        }
+
+        /// <summary>
         /// Stops the currently active action and advances to the next one or,
         /// if that was the last action in the script, stops the script as well.
         /// </summary>
-        public void StopCurrentAction () {
+        public void StopCurrentAction (bool success) {
             // remove the action
-            this.Dequeue(); 
+            base.Dequeue(); 
             // if we're out of actions, shut down
             if (this.IsEmpty && this.IsActive) {
-                StopScript();
+                StopScript(success);
             }
         }
 
@@ -96,9 +113,9 @@ namespace SomaSim.AI
         /// Stops this script, which also has the effect of stopping the 
         /// currently active action, and cancelling any other ones that have not yet activated.
         /// </summary>
-        public void StopScript () {
+        public void StopScript (bool success) {
             if (this.IsEnqueued && this.IsActive) {
-                this.Queue.Dequeue();
+                this.Queue.StopCurrentScript(success);
             } else if (ScriptQueue.DEBUG) {
                 throw new InvalidOperationException("Can't stop a script that isn't running: " + this);
             }
@@ -112,7 +129,7 @@ namespace SomaSim.AI
                 if (ScriptQueue.DEBUG) {
                     throw new InvalidOperationException("Can't update an empty script, it should have been dequened already");
                 }
-                StopScript(); // we have nothing left, bail
+                StopScript(true); // we have nothing left, bail
                 return;
             }
 
@@ -123,6 +140,14 @@ namespace SomaSim.AI
                 a.OnStarted();
             }
             a.OnUpdate();
+        }
+
+        new public void Enqueue (Action action) {
+            throw new InvalidOperationException("Enqueue not available, use Add instead");
+        }
+
+        new public void Dequeue () {
+            throw new InvalidOperationException("Dequeue not available, use one of the Stop methods instead");
         }
 
         public override string ToString () {
@@ -147,8 +172,8 @@ namespace SomaSim.AI
         /// Adds a new script, and if it's the only one, activates it immedately.
         /// </summary>
         /// <param name="script"></param>
-        public void Run (Script script) {
-            Enqueue(script);
+        virtual public void Run (Script script) {
+            base.Enqueue(script);
         }
 
         /// <summary>
@@ -156,24 +181,32 @@ namespace SomaSim.AI
         /// immediately (before additional ones are added).
         /// </summary>
         /// <param name="scripts"></param>
-        public void Run (IEnumerable<Script> scripts) {
-            Enqueue(scripts);
+        virtual public void Run (IEnumerable<Script> scripts) {
+            base.Enqueue(scripts);
         }
 
         /// <summary>
         /// Stops and dequeues the currently active script (if any). If there was  
         /// another script in the queue behind it, activates it.
         /// </summary>
-        public void StopCurrentScript () {
-            Dequeue();
+        virtual public void StopCurrentScript (bool success) {
+            base.Dequeue();
         }
 
         /// <summary>
         /// Stops and dequeues all scripts in the queue. This deactivates the currently
         /// active one, but does not activate or deactivate remaining ones. 
         /// </summary>
-        public void StopAllScripts () {
-            Clear();
+        virtual public void StopAllScripts (bool success) {
+            base.Clear();
+        }
+
+        new public void Enqueue (Script script) {
+            throw new InvalidOperationException("Enqueue not available, use Run instead");
+        }
+
+        new public void Dequeue () {
+            throw new InvalidOperationException("Dequeue not available, use one of the Stop methods instead");
         }
 
         public void OnUpdate () {
