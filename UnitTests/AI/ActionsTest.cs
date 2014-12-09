@@ -11,11 +11,14 @@ namespace SomaSim.AI
         public class TestAction : Action
         {
             public string name;
+            public bool stopOnStart = false;
             public int countActivate;
             public int countDeactivate;
+            public int countUpdate;
 
-            public TestAction (string name) {
+            public TestAction (string name, bool stopOnStart = false) {
                 this.name = name;
+                this.stopOnStart = stopOnStart;
             }
 
             public override void OnActivated () {
@@ -26,6 +29,18 @@ namespace SomaSim.AI
             public override void OnDeactivated (bool pushedback) {
                 this.countDeactivate++;
                 base.OnDeactivated(pushedback);
+            }
+
+            internal override void OnStarted () {
+                base.OnStarted();
+                if (stopOnStart) {
+                    Stop(true);
+                }
+            }
+
+            internal override void OnUpdate () {
+                base.OnUpdate();
+                this.countUpdate++;
             }
 
             public override string ToString () {
@@ -112,24 +127,37 @@ namespace SomaSim.AI
             // make some actions
             var a = new TestAction("a");
             var b = new TestAction("b");
-            var c = new TestAction("c");
+            var c = new TestAction("c", true); // this one stops before first update
             var seq = new TestScript("test", a, b, c);
 
             Assert.IsTrue(a.IsEnqueued && a.IsActive && !a.IsStarted);
+            Assert.IsTrue(a.countUpdate == 0);
             
             // fake an update cycle
             seq.OnUpdate();
 
             Assert.IsTrue(a.IsEnqueued && a.IsActive && a.IsStarted);
+            Assert.IsTrue(a.countUpdate == 1);
 
             // stop. this will remove and deactivate A, and activate B, 
             // but not start it yet until an update
             a.Stop(true);
             Assert.IsTrue(!a.IsEnqueued && !a.IsActive && !a.IsStarted);
             Assert.IsTrue( b.IsEnqueued &&  b.IsActive && !b.IsStarted);
+            Assert.IsTrue(a.countUpdate == 1);
+            Assert.IsTrue(b.countUpdate == 0);
 
             seq.OnUpdate();
             Assert.IsTrue(b.IsEnqueued && b.IsActive && b.IsStarted);
+            Assert.IsTrue(b.countUpdate == 1);
+
+            // stop b. this will activate c, which will stop itself before first update
+            b.Stop(true);
+            Assert.IsTrue(c.IsEnqueued && c.IsActive && !c.IsStarted);
+            Assert.IsTrue(c.countUpdate == 0);
+            seq.OnUpdate();
+            Assert.IsTrue(!c.IsEnqueued && !c.IsActive && !c.IsStarted);
+            Assert.IsTrue(c.countUpdate == 0); // this update never got a chance to run
         }
 
         [TestMethod]
@@ -182,6 +210,39 @@ namespace SomaSim.AI
             Assert.IsTrue(!def.IsEnqueued && !def.IsActive);
             Assert.IsTrue(def.countActivate == 1 && def.countDeactivate == 1);
 
+        }
+
+        [TestMethod]
+        public void TestStopOnFailure () {
+
+            // make some scripts
+
+            var a = new TestAction("a");
+            var b = new TestAction("b");
+            var c = new TestAction("c");
+            var abc = new TestScript("abc", a, b, c);
+            var d = new TestAction("d");
+            var e = new TestAction("e");
+            var f = new TestAction("f");
+            var def = new TestScript("def", d, e, f);
+
+            var q = new ScriptQueue();
+            q.Enqueue(new Script[] { abc, def });
+
+            q.OnUpdate();
+            Assert.IsTrue(a.IsEnqueued && a.IsActive && a.IsStarted);
+
+            // if we stop just action a with the failure flag set, it should stop the entire script
+            // and advance to the next one
+            abc.StopCurrentAction(false);
+
+            Assert.IsTrue(!a.IsEnqueued && !a.IsActive);
+            Assert.IsTrue(!abc.IsEnqueued && !abc.IsActive);
+            Assert.IsTrue(def.IsActive && d.IsActive);
+
+            // similary stopping the script will just remove it
+            def.StopScript(false);
+            Assert.IsTrue(!def.IsActive && !d.IsActive);
         }
 
         [TestMethod]

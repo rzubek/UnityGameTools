@@ -97,15 +97,20 @@ namespace SomaSim.AI
         }
 
         /// <summary>
-        /// Stops the currently active action and advances to the next one or,
+        /// If success is true, stops the currently active action and advances to the next one or,
         /// if that was the last action in the script, stops the script as well.
+        /// If success is false, stops the entire script.
         /// </summary>
         public void StopCurrentAction (bool success) {
-            // remove the action
-            base.Dequeue(); 
-            // if we're out of actions, shut down
-            if (this.IsEmpty && this.IsActive) {
-                StopScript(success);
+            if (this.IsActive && !success) {
+                StopScript(false);
+            } else {
+                // remove the action
+                base.Dequeue();
+                // if we're out of actions, shut down
+                if (this.IsEmpty && this.IsActive) {
+                    StopScript(success);
+                }
             }
         }
 
@@ -135,11 +140,13 @@ namespace SomaSim.AI
 
             // everything is okay, update 
             Action a = this.Head;
-            if (!a._updatedOnce) {
+            if (!a._updatedOnce && a.IsActive) {
                 a._updatedOnce = true;
                 a.OnStarted();
             }
-            a.OnUpdate();
+            if (a.IsActive) { // check isActive again just in case we got stopped in OnStarted
+                a.OnUpdate();
+            }
         }
 
         new public void Enqueue (Action action) {
