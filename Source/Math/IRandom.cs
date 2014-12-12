@@ -192,4 +192,37 @@ namespace SomaSim.Math
             return null;
         }
     }
+
+    /// <summary>
+    /// Mock implementation of IRandom that produces values from the specified lists.
+    /// </summary>
+    public class RandomMock : IRandom
+    {
+        private const float UINT_MUL = (1.0f / 4294967296.0f);
+
+        public IList<uint> uints;
+        public int index;
+
+        public RandomMock (IList<uint> uints) {
+            this.uints = uints;
+        }
+
+        /// </inheritDoc>
+        public void Init (uint seed) {
+            // no op
+        }
+
+        /// </inheritDoc>
+        public uint Generate () {
+            uint result = uints[index++];
+            if (index >= uints.Count) { index = 0; }
+            return result;
+        }
+
+        /// </inheritDoc>
+        public float GenerateFloat () {
+            uint result = Generate();
+            return result * UINT_MUL;
+        }
+    }
 }
