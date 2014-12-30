@@ -6,6 +6,20 @@ using UnityEngine;
 
 namespace SomaSim.Math
 {
+    public static class ListExtensions
+    {
+        /// <summary>
+        /// Special version of RemoveAt that has O(1) performance, but doesn't preserve list ordering.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="list"></param>
+        /// <param name="index"></param>
+        public static void RemoveAtConst<T> (this List<T> list, int index) {
+            list[index] = list[list.Count - 1];
+            list.RemoveAt(list.Count - 1);
+        }
+    }
+
     /// <summary>
     /// Collection of useful Vector utilities.
     /// </summary>
