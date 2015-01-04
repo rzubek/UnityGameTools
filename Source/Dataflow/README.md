@@ -5,7 +5,7 @@ Dataflow package is a basic implementation of reactive / dataflow programming el
 
 One big difference for reactive programming in **games** is that game updates are timing-sensitive: for example, when someone's position changes between frames, we may need to know how much time passed between those frames, so that we can calculate velocity. Our API takes time change into account.
 
-Here's an example from unit tests:
+Here's a trivial averager example from unit tests:
 
 ```lang=csharp
     source.Add(intadder);
@@ -42,7 +42,7 @@ Another example in which time actually matters. This one uses a moving average i
     AssertEqual(average.currentAverage, 2);
 ```
 
-Now here's an example of a barrier, which waits for all of its senders to report a true value before it turns true itself:
+Now here's an example of a boolean barrier, which waits for all of its senders to report a true value before it turns true itself:
 
 ```lang=csharp
     var preconditionA = new BaseSender<bool>();
