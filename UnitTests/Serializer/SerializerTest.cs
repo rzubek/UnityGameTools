@@ -187,6 +187,50 @@ namespace SomaSim.Serializer
             }
         }
 
+        private struct TestPrimitives
+        {
+            public byte b1;
+            public byte b2;
+            public sbyte sb1;
+            public sbyte sb2;
+            public short s1;
+            public short s2;
+            public ushort us1;
+            public ushort us2;
+            public int i1;
+            public int i2;
+            public uint u1;
+            public uint u2;
+            public float f;
+            public double d;
+            public char c1;
+            public char c2;
+            public string s;
+        };
+
+        [TestMethod]
+        public void TestSerializationDeserializationPrimitives () {
+
+            Serializer serializer = new Serializer();
+            serializer.Initialize();
+
+            TestPrimitives source = new TestPrimitives() { 
+                b1 = byte.MinValue, b2 = byte.MaxValue, sb1 = sbyte.MinValue, sb2 = sbyte.MaxValue,
+                s1 = short.MinValue, s2 = short.MaxValue, us1 = ushort.MinValue, us2 = ushort.MaxValue,
+                i1 = int.MinValue, i2 = int.MaxValue, u1 = uint.MinValue, u2 = uint.MaxValue,
+                f = (float)System.Math.PI, d = System.Math.PI, c1 = char.MinValue, c2 = char.MaxValue, s = "foo" };
+            object intermediate = serializer.Serialize(source, true);
+            TestPrimitives result = (TestPrimitives) serializer.Deserialize(intermediate);
+
+            foreach (var member in TypeUtils.GetMembers(source)) {
+                object sobj = TypeUtils.GetValue(member, source);
+                object robj = TypeUtils.GetValue(member, result);
+                Assert.IsTrue(sobj.Equals(robj));
+            }
+
+            serializer.Release();
+        }
+
         [TestMethod]
         public void TestSerializationDelta () {
             Serializer serializer = new Serializer();

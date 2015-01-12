@@ -255,8 +255,8 @@ namespace SomaSim.Serializer
         //
         // SERIALIZE
 
-        private static List<Type> INT_TYPES = new List<Type> { 
-            typeof(Int16), typeof(Int32), typeof(UInt16), typeof(UInt32), typeof(Char), typeof(Byte), typeof(SByte) 
+        private static List<Type> INT_TYPES = new List<Type> { // all types of size Int32 or smaller (so not Uint32 or larger)
+            typeof(Int16), typeof(Int32), typeof(UInt16), typeof(Char), typeof(Byte), typeof(SByte) 
         };
 
         /// <summary>
