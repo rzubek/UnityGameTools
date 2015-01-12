@@ -159,7 +159,8 @@ namespace SomaSim.Serializer
             }
 
             // we know the type, make an instance to deserialize into
-            object instance = CreateInstance(targettype);
+            int size = (value is ArrayList) ? ((ArrayList)value).Count : 0;
+            object instance = CreateInstance(targettype, size);
 
             // are we deserializing a dictionary?
             if (typeof(IDictionary).IsAssignableFrom(targettype)) {
@@ -195,6 +196,9 @@ namespace SomaSim.Serializer
                     return null;
                 }
 
+                Array array = instance as Array;
+                Type arrayElementType = (array != null) ? array.GetType().GetElementType() : null;
+                int i = 0;
                 foreach (object element in list) {
                     // do we need to convert values into some specific type?
                     Type valuetype = null;
@@ -202,7 +206,14 @@ namespace SomaSim.Serializer
                         valuetype = targettype.GetGenericArguments()[0]; // T in List<T>
                     }
                     object typedElement = Deserialize(element, valuetype);
-                    targettype.GetMethod("Add").Invoke(instance, new object[] { typedElement });
+
+                    // now insert into the list or array as needed
+                    if (array != null) { // T[]
+                        array.SetValue(Convert.ChangeType(typedElement, arrayElementType), i);
+                    } else {             // List<T> or List or some such
+                        targettype.GetMethod("Add").Invoke(instance, new object[] { typedElement });
+                    }
+                    i++;                    
                 }
             } else {
                 // class - deserialize each field recursively
@@ -335,7 +346,8 @@ namespace SomaSim.Serializer
                 }
 
                 if (serialize) {
-                    object serializedFieldValue = Serialize(rawFieldValue, false);
+                    bool specifyFieldType = false; 
+                    object serializedFieldValue = Serialize(rawFieldValue, specifyFieldType);
                     result[fieldName] = serializedFieldValue;
                 }
             }
@@ -493,7 +505,7 @@ namespace SomaSim.Serializer
             Type t = o.GetType();
             object instance = null;
             if (!_DefaultInstances.ContainsKey(t)) {
-                instance = _DefaultInstances[t] = CreateInstance(t);
+                instance = _DefaultInstances[t] = CreateInstance(t, 0);
             } else {
                 instance = _DefaultInstances[t];
             }
@@ -513,12 +525,16 @@ namespace SomaSim.Serializer
             _InstanceFactories.Remove(type);
         }
 
-        private object CreateInstance (Type type) {
+        private object CreateInstance (Type type, int length) {
             if (_InstanceFactories.ContainsKey(type)) {
                 return (_InstanceFactories[type]).Invoke();
-            } else {
-                return Activator.CreateInstance(type);
+            } 
+
+            if (type.IsArray) {
+                return Array.CreateInstance(type.GetElementType(), length);
             }
+
+            return Activator.CreateInstance(type);
         }
 
         //
