@@ -63,7 +63,6 @@ namespace SomaSim.Services
     internal class MouseInputSource : InputSource
     {
         public string MouseScrollWheelName = "Mouse ScrollWheel";
-        public float MouseWheelSensitivity = 2f;
 
         private bool _mouseDown = false;
 
@@ -101,7 +100,7 @@ namespace SomaSim.Services
 
             float wheel = Input.GetAxis(MouseScrollWheelName);
             if (wheel != 0) {
-                _service.OnZoom(pos, wheel * MouseWheelSensitivity, true);
+                _service.OnZoom(pos, wheel, true);
             }
         }
     }
