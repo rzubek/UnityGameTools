@@ -139,13 +139,22 @@ namespace SomaSim.AI
             }
 
             // everything is okay, update 
-            Action a = this.Head;
-            if (!a._updatedOnce && a.IsActive) {
-                a._updatedOnce = true;
-                a.OnStarted();
-            }
-            if (a.IsActive) { // check isActive again just in case we got stopped in OnStarted
-                a.OnUpdate();
+            try {
+                Action a = this.Head;
+                if (!a._updatedOnce && a.IsActive) {
+                    a._updatedOnce = true;
+                    a.OnStarted();
+                }
+                if (a.IsActive) { // check isActive again just in case we got stopped in OnStarted
+                    a.OnUpdate();
+                }
+            } catch (Exception ex) {
+                // stop this script, something went wrong
+                StopScript(false);
+
+                if (ScriptQueue.DEBUG) { // maybe rethrow the exception
+                    throw ex;
+                }
             }
         }
 
