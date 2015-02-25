@@ -70,10 +70,10 @@ namespace SomaSim.Collections
     public class SmartStack<T> : IEnumerable<T>, ICollection<T>, IEnumerable
         where T : class, ISmartStackElement
     {
-        private Stack<T> _stack;
+        private List<T> _stack;
 
         public SmartStack () {
-            this._stack = new Stack<T>();
+            this._stack = new List<T>();
         }
 
         /// <summary>
@@ -88,11 +88,11 @@ namespace SomaSim.Collections
         /// <param name="element"></param>
         public void Push (T element) {
             if (!IsEmpty) {
-                T top = _stack.Peek();
+                T top = Peek();
                 top.OnDeactivated();
             }
 
-            _stack.Push(element);
+            _stack.Add(element);
             element.OnPushed(this);
             element.OnActivated();
         }
@@ -107,13 +107,13 @@ namespace SomaSim.Collections
                 return null;
             }
 
-            T old = _stack.Peek();
+            T old = Peek();
             old.OnDeactivated();
             old.OnPopped();
-            _stack.Pop();
+            _stack.RemoveAt(_stack.Count - 1);
 
             if (!IsEmpty) {
-                T top = _stack.Peek();
+                T top = Peek();
                 top.OnActivated();
             }
 
@@ -125,7 +125,7 @@ namespace SomaSim.Collections
         /// </summary>
         /// <returns></returns>
         public T Peek () {
-            return IsEmpty ? null : _stack.Peek();
+            return _stack.Count <= 0 ? null : _stack[_stack.Count - 1];
         }
 
         /// <summary>
@@ -149,6 +149,29 @@ namespace SomaSim.Collections
         #endregion
 
         #region ICollection Members
+
+        /// <inheritDoc />
+        public bool Remove (T item) {
+            if (_stack.Count == 0) {
+                throw new InvalidOperationException();
+
+            } 
+            
+            if (item == Peek()) {
+                Pop();
+                return true;
+            }
+
+            // remove from the middle of the stack, which means the item is already deactivated
+            int index = _stack.IndexOf(item);
+            if (index < 0) {
+                return false; // not found
+            }
+
+            item.OnPopped();
+            _stack.RemoveAt(index);
+            return true;
+        }
 
         /// <inheritDoc />
         public void CopyTo (T[] array, int index) {
@@ -190,11 +213,6 @@ namespace SomaSim.Collections
         /// <inheritDoc />
         public bool IsReadOnly {
             get { return false; }
-        }
-
-        /// <inheritDoc />
-        public bool Remove (T item) {
-            throw new NotImplementedException();
         }
 
         #endregion

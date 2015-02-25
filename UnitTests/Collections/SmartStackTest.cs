@@ -82,5 +82,45 @@ namespace SomaSim.Collections
             Assert.IsFalse(e1.IsOnStack);
             Assert.IsNull(e1.container);
         }
+
+        [TestMethod]
+        public void TestAddRemove () {
+            // let's test ICollection<T> functions
+
+            SmartStack<TestEntry> stack = new SmartStack<TestEntry>();
+            Assert.IsTrue(stack.IsEmpty && stack.Count == 0 && stack.Peek() == null);
+
+            // make an empty something
+            TestEntry e1 = new TestEntry();
+            stack.Push(e1);
+
+            TestEntry e2 = new TestEntry();
+            stack.Push(e2);
+
+            TestEntry e3 = new TestEntry();
+            stack.Add(e3); // this should be the same as push
+            Assert.IsTrue(stack.Peek() == e3);
+            Assert.IsTrue(stack.Count == 3);
+
+            // verify that the one in the middle was activated and deactivated only once
+            Assert.IsTrue(e2.activationCount == 1 && e2.deactivationCount == 1);
+            Assert.IsTrue(e2.pushCount == 1 && e2.popCount == 0);
+
+            // now remove from the middle
+            bool result = stack.Remove(e2);
+            Assert.IsTrue(result);
+
+            Assert.IsTrue(stack.Count == 2);
+            Assert.IsTrue(stack.Peek() == e3);
+
+            // make sure removed item didn't get re/deactivated, only removed
+            Assert.IsTrue(e2.activationCount == 1 && e2.deactivationCount == 1);
+            Assert.IsTrue(e2.pushCount == 1 && e2.popCount == 1);
+            Assert.IsFalse(e2.IsOnStack);
+
+            // make sure we can't remove things that aren't there
+            Assert.IsFalse(stack.Remove(e2));   // double remove
+            Assert.IsFalse(stack.Remove(null)); // something that isn't there
+        }
     }
 }
