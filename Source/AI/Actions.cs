@@ -68,14 +68,14 @@ namespace SomaSim.AI
 
         /// <inheritDoc />
         virtual public void OnDeactivated (bool pushedback) {
-            // deactivate and pop all actions we contain
-            Clear();
-
             this.IsActive = false;
         }
 
         /// <inheritDoc />
         virtual public void OnDequeued (bool poppedtail) {
+            // pop all remaining actions we contain
+            Clear();
+
             this.Queue = null;
         }
 
