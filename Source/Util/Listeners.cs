@@ -66,4 +66,26 @@ namespace SomaSim.Util
             }
         }
     }
+
+
+    /// <summary>
+    /// Very simple implementation of the listener or observable pattern.
+    /// 
+    /// Usage: 
+    /// <code>
+    /// // add an event listener
+    /// OnSpecialEvent.Add((int a, int b, int c) => { doSomething(a, b, c); });
+    /// // ...
+    /// // invoke the event
+    /// OnSpecialEvent.Invoke(1, 2, 3); // calls all listeners in order
+    /// </code>
+    /// </summary>
+    public class Listeners<T1, T2, T3> : List<Action<T1, T2, T3>>
+    {
+        public void Invoke (T1 arg1, T2 arg2, T3 arg3) {
+            foreach (Action<T1, T2, T3> a in this) {
+                a.Invoke(arg1, arg2, arg3);
+            }
+        }
+    }
 }

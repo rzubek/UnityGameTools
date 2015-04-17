@@ -116,7 +116,7 @@ namespace SomaSim.AI
             Assert.IsTrue(d.IsEnqueued && !d.IsActive && d.countActivate == 1 && d.countDeactivate == 1);
 
             // now dequeue F from the front, this should pop it, and re-activate D
-            seq.StopCurrentAction(true);
+            seq.StopCurrentAction(true, null);
             Assert.IsTrue(!f.IsEnqueued && !f.IsActive && f.countActivate == 1 && f.countDeactivate == 1);
             Assert.IsTrue( d.IsEnqueued &&  d.IsActive && d.countActivate == 2 && d.countDeactivate == 1);
         }
@@ -205,7 +205,7 @@ namespace SomaSim.AI
             Assert.IsTrue(def.countActivate == 1 && def.countDeactivate == 0);
 
             // then if we force-stop DEF, it should clean out of the queue completely
-            def.StopScript(true);
+            def.StopScript(true, null);
             Assert.IsTrue(q.IsEmpty && q.Head == null);
             Assert.IsTrue(!def.IsEnqueued && !def.IsActive);
             Assert.IsTrue(def.countActivate == 1 && def.countDeactivate == 1);
@@ -234,14 +234,14 @@ namespace SomaSim.AI
 
             // if we stop just action a with the failure flag set, it should stop the entire script
             // and advance to the next one
-            abc.StopCurrentAction(false);
+            abc.StopCurrentAction(false, null);
 
             Assert.IsTrue(!a.IsEnqueued && !a.IsActive);
             Assert.IsTrue(!abc.IsEnqueued && !abc.IsActive);
             Assert.IsTrue(def.IsActive && d.IsActive);
 
             // similary stopping the script will just remove it
-            def.StopScript(false);
+            def.StopScript(false, null);
             Assert.IsTrue(!def.IsActive && !d.IsActive);
         }
 
@@ -270,7 +270,7 @@ namespace SomaSim.AI
 
             // stop the script. the first action in the next script
             // will be activated, but won't be started until another update
-            q.StopCurrentScript(true);
+            q.StopCurrentScript(true, null);
             Assert.IsTrue(!abc.IsEnqueued && !abc.IsActive && !a.IsActive && !a.IsStarted);
             Assert.IsTrue(def.IsEnqueued && def.IsActive && d.IsActive && !d.IsStarted);
 
@@ -278,7 +278,7 @@ namespace SomaSim.AI
             Assert.IsTrue(def.IsEnqueued && def.IsActive && d.IsActive && d.IsStarted);
 
             // clear everything. no more updates
-            q.StopAllScripts(true);
+            q.StopAllScripts(true, null);
             Assert.IsTrue(!def.IsEnqueued && !def.IsActive && !d.IsActive && !d.IsStarted);
             Assert.IsTrue(q.IsEmpty);
         }

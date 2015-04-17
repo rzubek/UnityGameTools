@@ -28,7 +28,7 @@ namespace SomaSim.AI
 
         virtual public void Stop (bool success) {
             if (this.IsEnqueued && this.IsActive) {
-                this.Script.StopCurrentAction(success);
+                this.Script.StopCurrentAction(success, this);
 
             } else if (ScriptQueue.DEBUG) {
                 // this action is not running, so something went wrong if someone is calling stop()
@@ -62,7 +62,7 @@ namespace SomaSim.AI
             this.IsActive = true;
             if (IsEmpty) {
                 // if empty, we shouldn't be here, pop ourselves off
-                StopScript(true);
+                StopScript(true, null);
             }
         }
 
@@ -101,15 +101,15 @@ namespace SomaSim.AI
         /// if that was the last action in the script, stops the script as well.
         /// If success is false, stops the entire script.
         /// </summary>
-        public void StopCurrentAction (bool success) {
+        public void StopCurrentAction (bool success, object context) {
             if (this.IsActive && !success) {
-                StopScript(false);
+                StopScript(false, context);
             } else {
                 // remove the action
                 base.Dequeue();
                 // if we're out of actions, shut down
                 if (this.IsEmpty && this.IsActive) {
-                    StopScript(success);
+                    StopScript(success, context);
                 }
             }
         }
@@ -118,9 +118,9 @@ namespace SomaSim.AI
         /// Stops this script, which also has the effect of stopping the 
         /// currently active action, and cancelling any other ones that have not yet activated.
         /// </summary>
-        public void StopScript (bool success) {
+        public void StopScript (bool success, object context) {
             if (this.IsEnqueued && this.IsActive) {
-                this.Queue.StopCurrentScript(success);
+                this.Queue.StopCurrentScript(success, context);
             } else if (ScriptQueue.DEBUG) {
                 throw new InvalidOperationException("Can't stop a script that isn't running: " + this);
             }
@@ -134,23 +134,23 @@ namespace SomaSim.AI
                 if (ScriptQueue.DEBUG) {
                     throw new InvalidOperationException("Can't update an empty script, it should have been dequened already");
                 }
-                StopScript(true); // we have nothing left, bail
+                StopScript(true, null); // we have nothing left, bail
                 return;
             }
 
             // everything is okay, update 
+            Action newhead = this.Head;
             try {
-                Action a = this.Head;
-                if (!a._updatedOnce && a.IsActive) {
-                    a._updatedOnce = true;
-                    a.OnStarted();
+                if (!newhead._updatedOnce && newhead.IsActive) {
+                    newhead._updatedOnce = true;
+                    newhead.OnStarted();
                 }
-                if (a.IsActive) { // check isActive again just in case we got stopped in OnStarted
-                    a.OnUpdate();
+                if (newhead.IsActive) { // check isActive again just in case we got stopped in OnStarted
+                    newhead.OnUpdate();
                 }
             } catch (Exception ex) {
                 // stop this script, something went wrong
-                StopScript(false);
+                StopScript(false, newhead);
 
                 if (ScriptQueue.DEBUG) { // maybe rethrow the exception
                     throw ex;
@@ -205,7 +205,7 @@ namespace SomaSim.AI
         /// Stops and dequeues the currently active script (if any). If there was  
         /// another script in the queue behind it, activates it.
         /// </summary>
-        virtual public void StopCurrentScript (bool success) {
+        virtual public void StopCurrentScript (bool success, object context) {
             base.Dequeue();
         }
 
@@ -213,7 +213,7 @@ namespace SomaSim.AI
         /// Stops and dequeues all scripts in the queue. This deactivates the currently
         /// active one, but does not activate or deactivate remaining ones. 
         /// </summary>
-        virtual public void StopAllScripts (bool success) {
+        virtual public void StopAllScripts (bool success, object context) {
             base.Clear();
         }
 
