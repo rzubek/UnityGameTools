@@ -16,7 +16,7 @@ namespace SomaSim.Util
     /// OnSpecialEvent.Invoke(); // calls all listeners in order
     /// </code>
     /// </summary>
-    public class Listeners : List<Action>
+    public class Listeners : HashSet<Action>
     {
         public void Invoke () {
             foreach (Action a in this) {
@@ -37,7 +37,7 @@ namespace SomaSim.Util
     /// OnSpecialEvent.Invoke(42); // calls all listeners in order
     /// </code>
     /// </summary>
-    public class Listeners<T> : List<Action<T>>
+    public class Listeners<T> : HashSet<Action<T>>
     {
         public void Invoke (T arg) {
             foreach (Action<T> a in this) {
@@ -58,7 +58,7 @@ namespace SomaSim.Util
     /// OnSpecialEvent.Invoke("answer", 42); // calls all listeners in order
     /// </code>
     /// </summary>
-    public class Listeners<T1, T2> : List<Action<T1, T2>>
+    public class Listeners<T1, T2> : HashSet<Action<T1, T2>>
     {
         public void Invoke (T1 arg1, T2 arg2) {
             foreach (Action<T1, T2> a in this) { 
@@ -80,7 +80,7 @@ namespace SomaSim.Util
     /// OnSpecialEvent.Invoke(1, 2, 3); // calls all listeners in order
     /// </code>
     /// </summary>
-    public class Listeners<T1, T2, T3> : List<Action<T1, T2, T3>>
+    public class Listeners<T1, T2, T3> : HashSet<Action<T1, T2, T3>>
     {
         public void Invoke (T1 arg1, T2 arg2, T3 arg3) {
             foreach (Action<T1, T2, T3> a in this) {
