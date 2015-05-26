@@ -54,15 +54,6 @@ namespace SomaSim.Serializer
         /// </summary>
         public bool ThrowErrorOnUnknownTypes = true;
 
-        /// <summary>
-        /// If true, deserialization will treat any string that starts with "_ " as a 
-        /// shorthand syntax for expressing flat class instances. So a string such as
-        /// "_ some-class key1 1 key2 true key3 foobar" will be first expanded into object
-        /// { "#type": "SomeClass", "key1": 1, "key2": true, "key3": "foobar" } 
-        /// before being passed further to the deserializer.
-        /// </summary>
-        public bool EnableShorthandSyntax = true;
-
         internal struct NSDef {
             public string prefix;
             public bool isclass;
@@ -131,14 +122,6 @@ namespace SomaSim.Serializer
             // return nulls as nulls
             if (value == null) {
                 return null;
-            }
-
-            // check for shorthand syntax real quick
-            if (EnableShorthandSyntax) {
-                string stringvalue = value as string;
-                if (stringvalue != null && stringvalue.StartsWith("_ ")) {
-                    value = ConvertFromShorthandToHashtable(stringvalue);
-                }
             }
 
             // enums get converted from a number value, or parsed by name from a string
@@ -409,8 +392,7 @@ namespace SomaSim.Serializer
 
         private Type FindTypeByName (string name, bool ignoreCase = false, bool cache = true) {
             // see if we need to convert from shorthand notation or not 
-            if (name.Contains("-"))
-            {
+            if (name.Contains("-")) {
                 name = MakeCamelCaseTypeName(name);
             }
 
@@ -434,6 +416,20 @@ namespace SomaSim.Serializer
             }
 
             return null;
+        }
+
+        private string MakeCamelCaseTypeName (string name) {
+            // split on dash, capitalize each segment, then squish back together
+            string[] segments = name.Split('-');
+            for (int i = 0; i < segments.Length; ++i) { segments[i] = UpcaseFirstLetter(segments[i]); }
+            return string.Join("", segments);
+        }
+
+        private string UpcaseFirstLetter (string str) {
+            return
+                (str == null) ? null :
+                (str.Length == 1) ? str.ToUpper() :
+                (char.ToUpper(str[0]) + str.Substring(1));
         }
 
         private Type FindTypeIncludingImplicits (string name, bool ignoreCase) {
@@ -560,55 +556,6 @@ namespace SomaSim.Serializer
 
         public void RemoveImplicitNamespace (string prefix) {
             _ImplicitNamespaces.RemoveAll((NSDef def) => def.prefix == prefix);
-        }
-
-
-        //
-        //
-        // SHORTHAND SYNTAX SUPPORT 
-
-        private Hashtable ConvertFromShorthandToHashtable (string value) {
-            var result = new Hashtable();
-
-            // strip away the prefix and any extra space, and then tokenize on space
-            var tokens = new Queue<string>(value.Substring(2).Trim().Split());
-
-            // first token must be the type name
-            result[TYPEKEY] = tokens.Dequeue();
-
-            // now peel off key value pairs
-            while (tokens.Count >= 2) {
-                string key = tokens.Dequeue();
-                object val = TryParseShorthandValue(tokens.Dequeue());
-                result[key] = val;
-            }
-
-            return result;
-        }
-
-        private object TryParseShorthandValue (string value) {
-            double d;
-            if (double.TryParse(value, out d)) { return d; }
-
-            bool b;
-            if (bool.TryParse(value, out b)) { return b; }
-
-            // it's a string
-            return value;
-        }
-
-        private string MakeCamelCaseTypeName (string name) {
-            // split on dash, capitalize each segment, then squish back together
-            string[] segments = name.Split('-');
-            for (int i = 0; i < segments.Length; ++i) { segments[i] = UpcaseFirstLetter(segments[i]); }
-            return string.Join("", segments);
-        }
-
-        private string UpcaseFirstLetter (string str) {
-            return
-                (str == null) ? null :
-                (str.Length == 1) ? str.ToUpper() :
-                (char.ToUpper(str[0]) + str.Substring(1));
         }
     }
 }
