@@ -71,18 +71,24 @@ namespace SomaSim.Serializer
         private Dictionary<string, Type> _ExplicitlyNamedTypes;
         private Dictionary<Type, object> _DefaultInstances;
         private Dictionary<Type, Func<object>> _InstanceFactories;
+        private Dictionary<Type, Dictionary<string, MemberInfo>> _TypeToAllMemberInfos;
         private List<NSDef> _ImplicitNamespaces;
 
         public void Initialize () {
             this._ExplicitlyNamedTypes = new Dictionary<string, Type>();
             this._DefaultInstances = new Dictionary<Type, object>();
             this._InstanceFactories = new Dictionary<Type, Func<object>>();
+            this._TypeToAllMemberInfos = new Dictionary<Type, Dictionary<string, MemberInfo>>();
             this._ImplicitNamespaces = new List<NSDef>();
         }
 
         public void Release () {
             this._ImplicitNamespaces.Clear();
             this._ImplicitNamespaces = null;
+
+            foreach (var entry in _TypeToAllMemberInfos) { entry.Value.Clear(); }
+            this._TypeToAllMemberInfos.Clear();
+            this._TypeToAllMemberInfos = null;
 
             this._InstanceFactories.Clear();
             this._InstanceFactories = null;
@@ -223,12 +229,19 @@ namespace SomaSim.Serializer
             return instance;
         }
 
-        private static Dictionary<string, MemberInfo> GetMemberInfos (Type t) {
-            Dictionary<string, MemberInfo> results = new Dictionary<string, MemberInfo>();
-            foreach (var info in TypeUtils.GetMembers(t)) {
-                results[info.Name] = info;
+        private Dictionary<string, MemberInfo> GetMemberInfos (Type t) {
+            Dictionary<string, MemberInfo> result = null;
+            if (_TypeToAllMemberInfos.TryGetValue(t, out result)) {
+                return result;
             }
-            return results;
+
+            result = new Dictionary<string, MemberInfo>();
+            foreach (var info in TypeUtils.GetMembers(t)) {
+                result[info.Name] = info;
+            }
+
+            _TypeToAllMemberInfos.Add(t, result);
+            return result;
         }
 
         /// <summary>
