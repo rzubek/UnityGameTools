@@ -191,6 +191,24 @@ namespace SomaSim.Math
 
             return null;
         }
+
+        /// <summary>
+        /// Performs an in-place Sattolo shuffle of all elements in the list. 
+        /// See: https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="rand"></param>
+        /// <param name="list"></param>
+        public static void Shuffle<T> (this IRandom rand, IList<T> list) {
+            int i = list.Count;
+            while (i > 1) {
+                i--;
+                int j = rand.Generate(0, i);
+                T temp = list[j];
+                list[j] = list[i];
+                list[i] = temp;
+            }
+        }
     }
 
     /// <summary>
