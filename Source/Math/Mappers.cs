@@ -120,20 +120,16 @@ namespace SomaSim.Math
                 throw new Exception("Number mapping definition invalid");
             }
 
-            float x0 = x[0];
             float y0 = y[0];
             if (input <= x[0]) {
                 return y0;
             }
 
             for (int i = 1, len = x.Count; i < len; i++) {
-                float x1 = x[i];
-                float y1 = y[i];
-                if (input < x1) {
+                if (input < x[i]) {
                     break;
                 }
-                x0 = x1;
-                y0 = y1;
+                y0 = y[i];
             }
 
             return y0;
