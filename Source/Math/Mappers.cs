@@ -29,12 +29,20 @@ namespace SomaSim.Math
 
         /// <summary>
         /// Given some input x value, find an appropriate y value given 
-        /// the piecewise linear function, interpolating between points as needed.
-        /// This function is linear in the number of points in the function.
+        /// the piecewise linear function. This function is linear in the number of points in the function.
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        public T Eval (float input) {
+        abstract public T Eval (float input);
+    }
+
+    /// <summary>
+    /// Base class for piecewise linear functions that interpolate between specified points.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public abstract class InterpolatingPiecewiseLinearMapper<T> : PiecewiseLinearMapper<T>
+    {
+        override public T Eval (float input) {
             if (IsEmpty || x.Count != y.Count) {
                 throw new Exception("Number mapping definition invalid");
             }
@@ -65,7 +73,7 @@ namespace SomaSim.Math
     /// <summary>
     /// Piecewise linear function that maps floats to floats
     /// </summary>
-    public class FloatMapper : PiecewiseLinearMapper<float>
+    public class FloatMapper : InterpolatingPiecewiseLinearMapper<float>
     {
         /// <inheritDoc/>
         override protected float Interpolate (float x, float x0, float x1, float y0, float y1) {
@@ -78,7 +86,7 @@ namespace SomaSim.Math
     /// <summary>
     /// Piecewise linear function that maps floats to colors
     /// </summary>
-    public class ColorMapper : PiecewiseLinearMapper<Color32>
+    public class ColorMapper : InterpolatingPiecewiseLinearMapper<Color32>
     {
         public void InitFromHexStrings (List<float> xs, List<string> colors) {
             this.x = xs;
@@ -90,5 +98,46 @@ namespace SomaSim.Math
             float p = (x - x0) / (x1 - x0);
             return Color32.Lerp(y0, y1, p);
         }
+    }
+
+    /// <summary>
+    /// Piecewise linear mapper, where each point defines a horizontal segment (dy = 0)
+    /// between itself and its next neignbor.
+    /// 
+    /// For example, given points (0, 0) and (1, 1), the mapper will return y = 0 for
+    /// x in [-inf, 1), and y = 1 for x in [1, inf]
+    /// </summary>
+    public class StepFunctionMapper : PiecewiseLinearMapper<float>
+    {
+        /// <summary>
+        /// Given some input x value, find an appropriate y value given by the step function.
+        /// This function is linear in the number of points in the function.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        override public float Eval (float input) {
+            if (IsEmpty || x.Count != y.Count) {
+                throw new Exception("Number mapping definition invalid");
+            }
+
+            float x0 = x[0];
+            float y0 = y[0];
+            if (input <= x[0]) {
+                return y0;
+            }
+
+            for (int i = 1, len = x.Count; i < len; i++) {
+                float x1 = x[i];
+                float y1 = y[i];
+                if (input < x1) {
+                    break;
+                }
+                x0 = x1;
+                y0 = y1;
+            }
+
+            return y0;
+        }
+
     }
 }
