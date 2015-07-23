@@ -146,8 +146,16 @@ namespace SomaSim.Math
         /// <param name="list"></param>
         /// <returns></returns>
         public static T PickElement<T> (this IRandom rand, IList<T> list) {
-            int index = rand.Generate(0, list.Count);
-            return list[index];
+            if (list == null || list.Count == 0) {
+                throw new System.Exception("Cannot pick random element from empty or null list");
+
+            } else if (list.Count == 1) {
+                return list[0];
+
+            } else {
+                int index = rand.Generate(0, list.Count);
+                return list[index];
+            }
         }
 
         /// <summary>
@@ -157,8 +165,16 @@ namespace SomaSim.Math
         /// <param name="list"></param>
         /// <returns></returns>
         public static T PickElement<T> (this IRandom rand, IList list) where T : class {
-            int index = rand.Generate(0, list.Count);
-            return list[index] as T;
+            if (list == null || list.Count == 0) {
+                throw new System.Exception("Cannot pick random element from empty or null list");
+
+            } else if (list.Count == 1) {
+                return list[0] as T;
+
+            } else {
+                int index = rand.Generate(0, list.Count);
+                return list[index] as T;
+            }
         }
 
         /// <summary>
