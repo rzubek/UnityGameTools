@@ -7,26 +7,50 @@ namespace SomaSim.Math
     public class MathUtilTest
     {
         [TestMethod]
-        public void TestQuantize () {
+        public void TestSnapDown () {
             // floats
-            Assert.IsTrue(MathUtil.Quantize(-10f, 5f) == -10f);
-            Assert.IsTrue(MathUtil.Quantize(-5.01f, 5f) == -10f);
-            Assert.IsTrue(MathUtil.Quantize(-5f, 5f) == -5f);
-            Assert.IsTrue(MathUtil.Quantize(-0.01f, 5f) == -5f);
-            Assert.IsTrue(MathUtil.Quantize(0f, 5f) == 0f);
-            Assert.IsTrue(MathUtil.Quantize(4.99f, 5f) == 0f);
-            Assert.IsTrue(MathUtil.Quantize(5f, 5f) == 5f);
-            Assert.IsTrue(MathUtil.Quantize(9.99f, 5f) == 5f);
+            Assert.IsTrue(MathUtil.SnapDown(-10f, 5f) == -10f);
+            Assert.IsTrue(MathUtil.SnapDown(-5.01f, 5f) == -10f);
+            Assert.IsTrue(MathUtil.SnapDown(-5f, 5f) == -5f);
+            Assert.IsTrue(MathUtil.SnapDown(-0.01f, 5f) == -5f);
+            Assert.IsTrue(MathUtil.SnapDown(0f, 5f) == 0f);
+            Assert.IsTrue(MathUtil.SnapDown(4.99f, 5f) == 0f);
+            Assert.IsTrue(MathUtil.SnapDown(5f, 5f) == 5f);
+            Assert.IsTrue(MathUtil.SnapDown(9.99f, 5f) == 5f);
 
             // ints
-            Assert.IsTrue(MathUtil.Quantize(-10, 5) == -10);
-            Assert.IsTrue(MathUtil.Quantize(-6, 5) == -10);
-            Assert.IsTrue(MathUtil.Quantize(-5, 5) == -5);
-            Assert.IsTrue(MathUtil.Quantize(-1, 5) == -5);
-            Assert.IsTrue(MathUtil.Quantize(0, 5) == 0);
-            Assert.IsTrue(MathUtil.Quantize(4, 5) == 0);
-            Assert.IsTrue(MathUtil.Quantize(5, 5) == 5);
-            Assert.IsTrue(MathUtil.Quantize(9, 5) == 5);
+            Assert.IsTrue(MathUtil.SnapDown(-10, 5) == -10);
+            Assert.IsTrue(MathUtil.SnapDown(-6, 5) == -10);
+            Assert.IsTrue(MathUtil.SnapDown(-5, 5) == -5);
+            Assert.IsTrue(MathUtil.SnapDown(-1, 5) == -5);
+            Assert.IsTrue(MathUtil.SnapDown(0, 5) == 0);
+            Assert.IsTrue(MathUtil.SnapDown(4, 5) == 0);
+            Assert.IsTrue(MathUtil.SnapDown(5, 5) == 5);
+            Assert.IsTrue(MathUtil.SnapDown(9, 5) == 5);
+        }
+
+        [TestMethod]
+        public void TestSnapUp () {
+            // floats
+            Assert.IsTrue(MathUtil.SnapUp(-10f, 5f) == -10f);
+            Assert.IsTrue(MathUtil.SnapUp(-9.99f, 5f) == -5f);
+            Assert.IsTrue(MathUtil.SnapUp(-5f, 5f) == -5f);
+            Assert.IsTrue(MathUtil.SnapUp(-4.99f, 5f) == 0f);
+            Assert.IsTrue(MathUtil.SnapUp(-0.01f, 5f) == 0f);
+            Assert.IsTrue(MathUtil.SnapUp(0f, 5f) == 0f);
+            Assert.IsTrue(MathUtil.SnapUp(0.01f, 5f) == 5f);
+            Assert.IsTrue(MathUtil.SnapUp(5f, 5f) == 5f);
+            Assert.IsTrue(MathUtil.SnapUp(5.01f, 5f) == 10f);
+
+            // ints
+            Assert.IsTrue(MathUtil.SnapUp(-10, 5) == -10);
+            Assert.IsTrue(MathUtil.SnapUp(-9, 5) == -5);
+            Assert.IsTrue(MathUtil.SnapUp(-5, 5) == -5);
+            Assert.IsTrue(MathUtil.SnapUp(-4, 5) == 0);
+            Assert.IsTrue(MathUtil.SnapUp(0, 5) == 0);
+            Assert.IsTrue(MathUtil.SnapUp(1, 5) == 5);
+            Assert.IsTrue(MathUtil.SnapUp(5, 5) == 5);
+            Assert.IsTrue(MathUtil.SnapUp(6, 5) == 10);
         }
 
         [TestMethod]

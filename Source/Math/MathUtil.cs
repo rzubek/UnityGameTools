@@ -19,7 +19,7 @@ namespace Game.Util
         /// <param name="value"></param>
         /// <param name="step"></param>
         /// <returns></returns>
-        public static float Quantize (float value, float step) {
+        public static float SnapDown (float value, float step) {
             return Mathf.Floor(value / step) * step;
         }
 
@@ -31,8 +31,32 @@ namespace Game.Util
         /// <param name="value"></param>
         /// <param name="step"></param>
         /// <returns></returns>
-        public static int Quantize (int value, int step) {
+        public static int SnapDown (int value, int step) {
             return Mathf.FloorToInt((float)value / step) * step;
+        }
+
+        /// <summary>
+        /// Snaps the given value to the nearest higher multiple of the step value.
+        /// For example, given step of 5, values in (0, 5] will snap to 5; 
+        /// values in (5, 10] will snap to 10, values in (-5, 0] will snap to 0, etc.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="step"></param>
+        /// <returns></returns>
+        public static float SnapUp (float value, float step) {
+            return Mathf.Ceil(value / step) * step;
+        }
+
+        /// <summary>
+        /// Snaps the given value to the nearest lower multiple of the step value.
+        /// For example, given step of 5, integer values in [1, 5] will snap to 5; 
+        /// values in [6, 10] will snap to 10, values in [-4, 0] will snap to 0, etc.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="step"></param>
+        /// <returns></returns>
+        public static int SnapUp (int value, int step) {
+            return Mathf.CeilToInt((float)value / step) * step;
         }
 
         /// <summary>
