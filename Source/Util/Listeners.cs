@@ -16,10 +16,11 @@ namespace SomaSim.Util
     /// OnSpecialEvent.Invoke(); // calls all listeners in order
     /// </code>
     /// </summary>
-    public class Listeners : HashSet<Action>
+    public class Listeners : List<Action>
     {
         public void Invoke () {
-            foreach (Action a in this) {
+            for (int i = 0, count = this.Count; i < count; i++) {
+                Action a = this[i];
                 a.Invoke();
             }
         }
@@ -37,10 +38,11 @@ namespace SomaSim.Util
     /// OnSpecialEvent.Invoke(42); // calls all listeners in order
     /// </code>
     /// </summary>
-    public class Listeners<T> : HashSet<Action<T>>
+    public class Listeners<T> : List<Action<T>>
     {
         public void Invoke (T arg) {
-            foreach (Action<T> a in this) {
+            for (int i = 0, count = this.Count; i < count; i++) {
+                var a = this[i];
                 a.Invoke(arg);
             }
         }
@@ -58,10 +60,11 @@ namespace SomaSim.Util
     /// OnSpecialEvent.Invoke("answer", 42); // calls all listeners in order
     /// </code>
     /// </summary>
-    public class Listeners<T1, T2> : HashSet<Action<T1, T2>>
+    public class Listeners<T1, T2> : List<Action<T1, T2>>
     {
         public void Invoke (T1 arg1, T2 arg2) {
-            foreach (Action<T1, T2> a in this) { 
+            for (int i = 0, count = this.Count; i < count; i++) {
+                var a = this[i];
                 a.Invoke(arg1, arg2); 
             }
         }
@@ -80,10 +83,11 @@ namespace SomaSim.Util
     /// OnSpecialEvent.Invoke(1, 2, 3); // calls all listeners in order
     /// </code>
     /// </summary>
-    public class Listeners<T1, T2, T3> : HashSet<Action<T1, T2, T3>>
+    public class Listeners<T1, T2, T3> : List<Action<T1, T2, T3>>
     {
         public void Invoke (T1 arg1, T2 arg2, T3 arg3) {
-            foreach (Action<T1, T2, T3> a in this) {
+            for (int i = 0, count = this.Count; i < count; i++) {
+                var a = this[i];
                 a.Invoke(arg1, arg2, arg3);
             }
         }
