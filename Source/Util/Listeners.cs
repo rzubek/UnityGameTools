@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace SomaSim.Util
@@ -19,9 +20,19 @@ namespace SomaSim.Util
     public class Listeners : List<Action>
     {
         public void Invoke () {
-            for (int i = 0, count = this.Count; i < count; i++) {
+            int count = this.Count;
+            for (int i = 0; i < count; i++) {
                 Action a = this[i];
                 a.Invoke();
+
+                CheckCount(count);
+            }
+        }
+
+        [Conditional("UNITY_EDITOR")]
+        private void CheckCount(int count) {
+            if (count != this.Count) {
+                UnityEngine.Debug.LogWarning("Iterator invalidation in Listeners -- Listeners does not support being modified while invoking listeners");
             }
         }
     }
@@ -41,9 +52,19 @@ namespace SomaSim.Util
     public class Listeners<T> : List<Action<T>>
     {
         public void Invoke (T arg) {
-            for (int i = 0, count = this.Count; i < count; i++) {
+            int count = this.Count;
+            for (int i = 0; i < count; i++) {
                 var a = this[i];
                 a.Invoke(arg);
+
+                CheckCount(count);
+            }
+        }
+
+        [Conditional("UNITY_EDITOR")]
+        private void CheckCount (int count) {
+            if (count != this.Count) {
+                UnityEngine.Debug.LogWarning("Iterator invalidation in Listeners -- Listeners does not support being modified while invoking listeners");
             }
         }
     }
@@ -63,9 +84,19 @@ namespace SomaSim.Util
     public class Listeners<T1, T2> : List<Action<T1, T2>>
     {
         public void Invoke (T1 arg1, T2 arg2) {
-            for (int i = 0, count = this.Count; i < count; i++) {
+            int count = this.Count;
+            for (int i = 0; i < count; i++) {
                 var a = this[i];
-                a.Invoke(arg1, arg2); 
+                a.Invoke(arg1, arg2);
+
+                CheckCount(count);
+            }
+        }
+
+        [Conditional("UNITY_EDITOR")]
+        private void CheckCount (int count) {
+            if (count != this.Count) {
+                UnityEngine.Debug.LogWarning("Iterator invalidation in Listeners -- Listeners does not support being modified while invoking listeners");
             }
         }
     }
@@ -86,9 +117,19 @@ namespace SomaSim.Util
     public class Listeners<T1, T2, T3> : List<Action<T1, T2, T3>>
     {
         public void Invoke (T1 arg1, T2 arg2, T3 arg3) {
-            for (int i = 0, count = this.Count; i < count; i++) {
+            int count = this.Count;
+            for (int i = 0; i < count; i++) {
                 var a = this[i];
                 a.Invoke(arg1, arg2, arg3);
+
+                CheckCount(count);
+            }
+        }
+
+        [Conditional("UNITY_EDITOR")]
+        private void CheckCount (int count) {
+            if (count != this.Count) {
+                UnityEngine.Debug.LogWarning("Iterator invalidation in Listeners -- Listeners does not support being modified while invoking listeners");
             }
         }
     }
