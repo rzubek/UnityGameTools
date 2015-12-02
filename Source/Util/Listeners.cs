@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace SomaSim.Util
@@ -23,7 +24,15 @@ namespace SomaSim.Util
             for (int i = 0; i < count; i++) {
                 Action a = this[i];
                 a.Invoke();
-                Logger.AssertInEditor(count == this.Count, "Listeners list modified while iterating.");
+
+                CheckCount(count);
+            }
+        }
+
+        [Conditional("UNITY_EDITOR")]
+        private void CheckCount(int count) {
+            if (count != this.Count) {
+                UnityEngine.Debug.LogWarning("Iterator invalidation in Listeners -- Listeners does not support being modified while invoking listeners");
             }
         }
     }
@@ -47,7 +56,15 @@ namespace SomaSim.Util
             for (int i = 0; i < count; i++) {
                 var a = this[i];
                 a.Invoke(arg);
-                Logger.AssertInEditor(count == this.Count, "Listeners list modified while iterating.");
+
+                CheckCount(count);
+            }
+        }
+
+        [Conditional("UNITY_EDITOR")]
+        private void CheckCount (int count) {
+            if (count != this.Count) {
+                UnityEngine.Debug.LogWarning("Iterator invalidation in Listeners -- Listeners does not support being modified while invoking listeners");
             }
         }
     }
@@ -71,7 +88,15 @@ namespace SomaSim.Util
             for (int i = 0; i < count; i++) {
                 var a = this[i];
                 a.Invoke(arg1, arg2);
-                Logger.AssertInEditor(count == this.Count, "Listeners list modified while iterating.");
+
+                CheckCount(count);
+            }
+        }
+
+        [Conditional("UNITY_EDITOR")]
+        private void CheckCount (int count) {
+            if (count != this.Count) {
+                UnityEngine.Debug.LogWarning("Iterator invalidation in Listeners -- Listeners does not support being modified while invoking listeners");
             }
         }
     }
@@ -96,7 +121,15 @@ namespace SomaSim.Util
             for (int i = 0; i < count; i++) {
                 var a = this[i];
                 a.Invoke(arg1, arg2, arg3);
-                Logger.AssertInEditor(count == this.Count, "Listeners list modified while iterating.");
+
+                CheckCount(count);
+            }
+        }
+
+        [Conditional("UNITY_EDITOR")]
+        private void CheckCount (int count) {
+            if (count != this.Count) {
+                UnityEngine.Debug.LogWarning("Iterator invalidation in Listeners -- Listeners does not support being modified while invoking listeners");
             }
         }
     }
