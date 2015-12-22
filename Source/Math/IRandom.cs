@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -74,14 +75,24 @@ namespace SomaSim.Math
     public static class RandomExtensions
     {
         /// <summary>
+        /// Initializes the RNG from the DateTime.ticks field of the specified time
+        /// (the actual resolution of the ticks field is implementation-specific, see DateTime docs)
+        /// </summary>
+        /// <param name="time"></param>
+        public static void Init (this IRandom rng, DateTime time) {
+            uint seed = (uint)time.Ticks;
+            rng.Init(seed);
+        }
+
+        /// <summary>
         /// Generates the next random value in the half-open range [min, max)
         /// </summary>
-        /// <param name="rand"></param>
+        /// <param name="rng"></param>
         /// <param name="min"></param>
         /// <param name="max"></param>
         /// <returns></returns>
-        public static int Generate (this IRandom rand, int min, int max) {
-            uint p = rand.Generate();
+        public static int Generate (this IRandom rng, int min, int max) {
+            uint p = rng.Generate();
             uint mod = (uint) (p % (max - min));
 			return (int) (mod + min);
         }
@@ -89,12 +100,12 @@ namespace SomaSim.Math
         /// <summary>
         /// Generates the next random float in the half-open range [min, max)
         /// </summary>
-        /// <param name="rand"></param>
+        /// <param name="rng"></param>
         /// <param name="min"></param>
         /// <param name="max"></param>
         /// <returns></returns>
-        public static float Generate (this IRandom rand, float min, float max) {
-            float p = rand.GenerateFloat();
+        public static float Generate (this IRandom rng, float min, float max) {
+            float p = rng.GenerateFloat();
             return (1 - p) * min + p * max;
         }
 
@@ -132,11 +143,11 @@ namespace SomaSim.Math
         /// Generates the next value for the roll of a die with specified number of sides.
         /// For example, sides = 20 will generate values in the range [1, 20] for a d20 die.
         /// </summary>
-        /// <param name="rand"></param>
+        /// <param name="rng"></param>
         /// <param name="diesize"></param>
         /// <returns></returns>
-        public static uint DieRoll (this IRandom rand, uint sides) {
-            return (uint)(Generate(rand, 0, (int)sides) + 1);
+        public static uint DieRoll (this IRandom rng, uint sides) {
+            return (uint)(Generate(rng, 0, (int)sides) + 1);
         }
 
         /// <summary>
@@ -145,7 +156,7 @@ namespace SomaSim.Math
         /// <typeparam name="T"></typeparam>
         /// <param name="list"></param>
         /// <returns></returns>
-        public static T PickElement<T> (this IRandom rand, IList<T> list) {
+        public static T PickElement<T> (this IRandom rng, IList<T> list) {
             if (list == null || list.Count == 0) {
                 throw new System.Exception("Cannot pick random element from empty or null list");
 
@@ -153,7 +164,7 @@ namespace SomaSim.Math
                 return list[0];
 
             } else {
-                int index = rand.Generate(0, list.Count);
+                int index = rng.Generate(0, list.Count);
                 return list[index];
             }
         }
@@ -164,7 +175,7 @@ namespace SomaSim.Math
         /// <typeparam name="T"></typeparam>
         /// <param name="list"></param>
         /// <returns></returns>
-        public static T PickElement<T> (this IRandom rand, IList list) where T : class {
+        public static T PickElement<T> (this IRandom rng, IList list) where T : class {
             if (list == null || list.Count == 0) {
                 throw new System.Exception("Cannot pick random element from empty or null list");
 
@@ -172,7 +183,7 @@ namespace SomaSim.Math
                 return list[0] as T;
 
             } else {
-                int index = rand.Generate(0, list.Count);
+                int index = rng.Generate(0, list.Count);
                 return list[index] as T;
             }
         }
@@ -187,14 +198,14 @@ namespace SomaSim.Math
         /// 
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="rand"></param>
+        /// <param name="rng"></param>
         /// <param name="list"></param>
         /// <param name="weights"></param>
         /// <param name="normalized"></param>
         /// <returns></returns>
-        public static T PickElement<T> (this IRandom rand, IList<T> list, IList<float> weights, bool normalized = false) where T : class {
+        public static T PickElement<T> (this IRandom rng, IList<T> list, IList<float> weights, bool normalized = false) where T : class {
             float sum = normalized ? 1 : weights.Sum();
-            float index = rand.GenerateFloat() * sum;
+            float index = rng.GenerateFloat() * sum;
             
             for (int i = 0, count = list.Count; i < count; ++i) {
                 float weight = weights[i];
@@ -213,13 +224,13 @@ namespace SomaSim.Math
         /// See: https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="rand"></param>
+        /// <param name="rng"></param>
         /// <param name="list"></param>
-        public static void Shuffle<T> (this IRandom rand, IList<T> list) {
+        public static void Shuffle<T> (this IRandom rng, IList<T> list) {
             int i = list.Count;
             while (i > 1) {
                 i--;
-                int j = rand.Generate(0, i);
+                int j = rng.Generate(0, i);
                 T temp = list[j];
                 list[j] = list[i];
                 list[i] = temp;
@@ -259,4 +270,33 @@ namespace SomaSim.Math
             return result * UINT_MUL;
         }
     }
+
+    /// <summary>
+    /// Mock implementation of IRandom that produces only the seed value, over and over.
+    /// So it's not really random, you know. :)
+    /// 
+    /// See http://dilbert.com/strip/2001-10-25
+    /// </summary>
+    public class NonRandomMock : IRandom
+    {
+        private const float UINT_MUL = (1.0f / 4294967296.0f);
+
+        public uint result;
+
+        /// </inheritDoc>
+        public void Init (uint seed) {
+            this.result = seed;
+        }
+
+        /// </inheritDoc>
+        public uint Generate () {
+            return result;
+        }
+
+        /// </inheritDoc>
+        public float GenerateFloat () {
+            return result * UINT_MUL;
+        }
+    }
+
 }
