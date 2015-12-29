@@ -66,7 +66,7 @@ namespace Game.Util
         /// <param name="min"></param>
         /// <param name="max"></param>
         /// <returns></returns>
-        public static float Clamp (float value, float min = 0f, float max = 1f) {
+        public static float Clamp (float value, float min, float max) {
             if (value < min) { return min; }
             if (value > max) { return max; }
             return value;
