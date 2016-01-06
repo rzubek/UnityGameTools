@@ -29,30 +29,36 @@ namespace SomaSim.Serializer
         public bool SkipDefaultsDuringSerialization = true;
 
         /// <summary>
-        /// If true, when deserializing a strongly typed class, any key in JSON
-        /// that doesn't correspond to a member field in the class instance will 
-        /// cause an exception to be thrown.
+        /// When deserializing a strongly typed class, any key in JSON that doesn't 
+        /// correspond to a member field in the class instance will cause this function
+        /// to be called (if the callback is not null). Takes the key name, and a message string.
         /// </summary>
-        public bool ThrowErrorOnSpuriousData = true;
+        public Action<string, string> ErrorOnSpuriousData = DefaultErrorCallback;
 
         /// <summary>
-        /// If true, attempting to serialize null will cause an exception to be thrown.
+        /// Attempting to serialize null will call this callback, if set.
+        /// Callback takes a message string.
         /// </summary>
-        public bool ThrowErrorOnSerializingNull = false;
+        public Action<string> ErrorOnSerializingNull = null; // by default, this one is turned off
 
         /// <summary>
         /// In case we try to deserialize a scalar value into a field that expects a 
-        /// class instance or a collection, if this is true an exception will be thrown,
-        /// otherwise the unexpected value will be deserialized as null.
+        /// class instance or a collection, it will cause this callback to be called
+        /// (if it's set). In any case, the unexpected value will be deserialized as null.
+        /// Callback takes a message string.
         /// </summary>
-        public bool ThrowErrorOnUnexpectedCollections = true;
+        public Action<string> ErrorOnUnexpectedCollections = DefaultErrorCallback;
 
         /// <summary>
         /// In the case deserializer finds a "#type" annotation that doesn't correspond to 
-        /// any known type, if this is true, an exception will be thrown; otherwise 
-        /// the object will be deserialized as null.
+        /// any known type, it will cause this callback to be called (if it's set).
+        /// In any case the object will be deserialized as null. 
+        /// Callback takes the unexpected annotation as a string, and a message string.
         /// </summary>
-        public bool ThrowErrorOnUnknownTypes = true;
+        public Action<string, string> ErrorOnUnknownTypes = DefaultErrorCallback;
+
+        private static void DefaultErrorCallback (string a) { throw new Exception(a); }
+        private static void DefaultErrorCallback (string a, string b) { throw new Exception(a + " " + b); }
 
         internal struct NSDef {
             public string prefix;
@@ -155,8 +161,8 @@ namespace SomaSim.Serializer
             if (typeof(IDictionary).IsAssignableFrom(targettype)) {
                 Hashtable table = value as Hashtable;
                 if (table == null) {
-                    if (ThrowErrorOnUnexpectedCollections) {
-                        throw new Exception("Deserializer found value where Hashtable expected: " + value);
+                    if (ErrorOnUnexpectedCollections != null) {
+                        ErrorOnUnexpectedCollections("Deserializer found value where Hashtable expected: " + value);
                     }
                     return null;
                 }
@@ -179,8 +185,8 @@ namespace SomaSim.Serializer
                 // recursively deserialize all values
                 ArrayList list = value as ArrayList;
                 if (list == null) {
-                    if (ThrowErrorOnUnexpectedCollections) {
-                        throw new Exception("Deserializer found value where ArrayList expected: " + value);
+                    if (ErrorOnUnexpectedCollections != null) {
+                        ErrorOnUnexpectedCollections("Deserializer found value where ArrayList expected: " + value);
                     }
                     return null;
                 }
@@ -248,12 +254,12 @@ namespace SomaSim.Serializer
                         object fieldval = Deserialize(entry.Value, TypeUtils.GetMemberType(member));
                         if (member is PropertyInfo) { ((PropertyInfo)member).SetValue(target, fieldval, null); }
                         if (member is FieldInfo) { ((FieldInfo)member).SetValue(target, fieldval); }
-                    } else if (ThrowErrorOnSpuriousData) {
-                        throw new Exception("Deserializer found key in data but not in class, key=" + key + ", class=" + target);
+                    } else if (ErrorOnSpuriousData != null) {
+                        ErrorOnSpuriousData(key, "Deserializer found key in data but not in class, key=" + key + ", class=" + target);
                     }
                 }
-            } else if (ThrowErrorOnSpuriousData) {
-                throw new Exception("Deserializer can't populate class or struct from a non-hashtable");
+            } else if (ErrorOnSpuriousData != null) {
+                ErrorOnSpuriousData("", "Deserializer can't populate class or struct from a non-hashtable");
             }
         }
 
@@ -276,8 +282,8 @@ namespace SomaSim.Serializer
         /// <returns></returns>
         public object Serialize (object value, bool specifyType = false) {
             if (value == null) {
-                if (ThrowErrorOnSerializingNull) {
-                    throw new Exception("Serializer encountered an unexpected null");
+                if (ErrorOnSerializingNull != null) {
+                    ErrorOnSerializingNull("Serializer encountered an unexpected null");
                 }
 
                 return null;
@@ -411,8 +417,8 @@ namespace SomaSim.Serializer
                 return type;
             }
 
-            if (ThrowErrorOnUnknownTypes) {
-                throw new Exception("Serializer could not find type information for " + name);
+            if (ErrorOnUnknownTypes != null) {
+                ErrorOnUnknownTypes(name, "Serializer could not find type information for " + name);
             }
 
             return null;
