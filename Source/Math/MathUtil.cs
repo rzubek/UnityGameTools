@@ -166,6 +166,25 @@ namespace Game.Util
             return last - first;
         }
 
+        /// <summary>
+        /// Returns true if the given time is inside the half-open interval [from, to), 
+        /// accounting for 24-hour wrapping. For example, if from = 17 and to = 2 
+        /// (so between 5pm and 2am), time = 1 is inside the interval, but 2 or 3 is not; 
+        /// 16 is not inside the interval, but 17 and 18 are.
+        /// </summary>
+        /// <param name="time"></param>
+        /// <returns></returns>
+        public static bool InsideDailyInterval (float time, float from, float to) {
+
+            bool sameday = (from < to);
+            time = (time < 24) ? time : (time % 24);
+
+            return sameday ?
+                (from <= time && time < to) :
+                (from <= time || time < to);
+        }
+
+
         public static bool IsEven (int value) { return (value & 1) == 0; }
         public static bool IsEven (uint value) { return (value & 1) == 0; }
         public static bool IsEven (float value) { return ((int)value & 1) == 0; }
