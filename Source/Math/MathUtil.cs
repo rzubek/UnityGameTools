@@ -60,6 +60,30 @@ namespace Game.Util
         }
 
         /// <summary>
+        /// Snaps the given value to the nearest higher multiple of the step value.
+        /// For example, given step of 5, values in [2.5, 7.5) will snap to 5; 
+        /// values in [7.5, 12.5) will snap to 10, etc.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="step"></param>
+        /// <returns></returns>
+        public static float SnapTo (float value, float step) {
+            return Mathf.Round(value / step) * step;
+        }
+
+        /// <summary>
+        /// Snaps the given value to the nearest multiple of the step value.
+        /// For example, given step of 5, integer values in [1, 2] will snap to 0; 
+        /// values in [3, 7] will snap to 5, etc.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="step"></param>
+        /// <returns></returns>
+        public static int SnapTo (int value, int step) {
+            return Mathf.RoundToInt((float)value / step) * step;
+        }
+
+        /// <summary>
         /// Clamps the value to be within the range [min, max]
         /// </summary>
         /// <param name="value"></param>
