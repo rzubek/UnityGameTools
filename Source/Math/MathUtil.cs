@@ -110,28 +110,44 @@ namespace Game.Util
         }
 
         /// <summary>
-        /// Interpolates between two values. If p = 0, returns a,
-        /// if p = 1, returns b, otherwise returns lerp of both.
+        /// Interpolates between two values. If p = 0, returns min,
+        /// if p = 1, returns max, otherwise returns lerp of both.
         /// </summary>
         /// <param name="p"></param>
-        /// <param name="a"></param>
-        /// <param name="b"></param>
+        /// <param name="min"></param>
+        /// <param name="max"></param>
         /// <returns></returns>
-        public static float Interpolate (float p, float a, float b) {
-            return (1 - p) * a + p * b;
+        public static float Interpolate (float p, float min, float max) {
+            return (1 - p) * min + p * max;
         }
 
         /// <summary>
         /// Finds position of q between two values a and b - an inverse of interpolation. 
-        /// If q = a returns 0, if q = b, returns 1, otherwise returns a value proportional to 
-		/// q's position between them. Throws a division by zero error if a = b.
+        /// If q = min returns 0, if q = max, returns 1, otherwise returns a value proportional to 
+		/// q's position between them. Throws a division by zero error if min = max.
         /// </summary>
         /// <param name="q"></param>
-        /// <param name="a"></param>
-        /// <param name="b"></param>
+        /// <param name="min"></param>
+        /// <param name="max"></param>
         /// <returns></returns>
-        public static float Uninterpolate (float q, float a, float b) {
-            return (q - a) / (b - a);
+        public static float Uninterpolate (float q, float min, float max) {
+            return (q - min) / (max - min);
+        }
+
+        /// <summary>
+        /// Converts a value from the range [amin, amax] to the range [bmin, bmax].
+        /// Equivalent to uninterpolating in [amin, amax] and then re-interpoloating between [bmin, bmax].
+        /// Throws a division by zero error if amin == amax.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="amin"></param>
+        /// <param name="amax"></param>
+        /// <param name="bmin"></param>
+        /// <param name="bmax"></param>
+        /// <returns></returns>
+        public static float ConvertRange (float value, float amin, float amax, float bmin, float bmax) {
+            float p = Uninterpolate(value, amin, amax);
+            return Interpolate(p, bmin, bmax);
         }
 
         /// <summary>
