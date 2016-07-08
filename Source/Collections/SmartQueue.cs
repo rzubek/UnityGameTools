@@ -72,10 +72,14 @@ namespace SomaSim.Collections
     public class SmartQueue<T> : IEnumerable<T>, ICollection<T>, IEnumerable
         where T : class, ISmartQueueElement
     {
-        private LinkedList<T> _queue;
+        private Deque<T> _queue;
 
         public SmartQueue () {
-            this._queue = new LinkedList<T>();
+            this._queue = new Deque<T>();
+        }
+
+        public SmartQueue (int capacity) {
+            this._queue = new Deque<T>(capacity);
         }
 
         /// <summary>
@@ -116,7 +120,7 @@ namespace SomaSim.Collections
         /// <param name="element"></param>
         public void PushHead (T element) {
             if (!IsEmpty) {
-                T head = _queue.First.Value;
+                T head = _queue.PeekFirst();
                 head.OnDeactivated(true);
             }
 
@@ -135,13 +139,13 @@ namespace SomaSim.Collections
                 return null;
             }
 
-            T head = _queue.First.Value;
+            T head = _queue.PeekFirst();
             head.OnDeactivated(false);
             head.OnDequeued(false);
             _queue.RemoveFirst();
 
             if (!IsEmpty) {
-                _queue.First.Value.OnActivated();
+                _queue.PeekFirst().OnActivated();
             }
 
             return head;
@@ -157,7 +161,7 @@ namespace SomaSim.Collections
                 return null;
             }
 
-            T tail = _queue.Last.Value;
+            T tail = _queue.PeekLast();
             if (_queue.Count == 1) {
                 tail.OnDeactivated(false);
             }
@@ -172,13 +176,13 @@ namespace SomaSim.Collections
         /// Returns the head element on the queue without removing it, or null if empty.
         /// </summary>
         /// <returns></returns>
-        public T Head { get { return IsEmpty ? null : _queue.First.Value; } }
+        public T Head { get { return IsEmpty ? null : _queue.PeekFirst(); } }
 
         /// <summary>
         /// Returns the tail element of the queue without removing it, or null if empty.
         /// </summary>
         /// <returns></returns>
-        public T Tail { get { return IsEmpty ? null : _queue.Last.Value; } }
+        public T Tail { get { return IsEmpty ? null : _queue.PeekLast(); } }
 
         #region IEnumerable Members
 

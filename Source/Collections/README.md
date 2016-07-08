@@ -1,3 +1,10 @@
+Deque
+===
+
+Double-ended queue that can be enqueued or dequeued from either end via O(1) operations.
+
+
+
 Smart Collections
 ===
 
