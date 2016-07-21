@@ -45,7 +45,7 @@ namespace SomaSim.AI
         public bool IsActive { get; private set; }
         public bool IsEnqueued { get { return this.Queue != null; } }
 
-        public Script (string name = null, IEnumerable<Action> actions = null) { 
+        public Script (string name = null, List<Action> actions = null) : base(actions == null ? 0 : actions.Count) { 
             this.Name = name;
             if (actions != null) {
                 this.Enqueue(actions);
@@ -92,7 +92,7 @@ namespace SomaSim.AI
         /// immediately, before subsequent ones are added.
         /// </summary>
         /// <param name="actions"></param>
-        public void Add (IEnumerable<Action> actions) {
+        public void Add (List<Action> actions) {
             base.Enqueue(actions);
         }
 
@@ -197,7 +197,7 @@ namespace SomaSim.AI
         /// immediately (before additional ones are added).
         /// </summary>
         /// <param name="scripts"></param>
-        virtual public void Run (IEnumerable<Script> scripts) {
+        virtual public void Run (List<Script> scripts) {
             base.Enqueue(scripts);
         }
 

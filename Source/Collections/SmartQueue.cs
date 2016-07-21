@@ -107,9 +107,9 @@ namespace SomaSim.Collections
         /// when it's pushed.
         /// </summary>
         /// <param name="elements"></param>
-        public void Enqueue (IEnumerable<T> elements) {
-            foreach (T element in elements) {
-                Enqueue(element);
+        public void Enqueue (List<T> elements) {
+            for (int i = 0, count = elements.Count; i < count; i++) { 
+                Enqueue(elements[i]);
             }
         }
 

@@ -53,7 +53,7 @@ namespace SomaSim.AI
             public int countActivate;
             public int countDeactivate;
 
-            public TestScript (string name, params Action[] actions) : base(name, actions) { }
+            public TestScript (string name, params Action[] actions) : base(name, actions.ToList()) { }
 
             public override void OnActivated () {
                 base.OnActivated();
@@ -78,7 +78,7 @@ namespace SomaSim.AI
             var f = new TestAction("f");
 
             var seq = new TestScript("test");
-            seq.Enqueue(new Action[] { a, b, c });
+            seq.Enqueue(new List<Action>() { a, b, c });
 
             // make sure they're all enqueued but only A is activated
             Assert.IsTrue(!seq.IsEmpty && seq.Head == a);
@@ -101,7 +101,7 @@ namespace SomaSim.AI
             Assert.IsTrue(!c.IsEnqueued && !c.IsActive && c.countActivate == 0 && c.countDeactivate == 0);
 
             // push two more 
-            seq.Enqueue(new Action[] { d, e });
+            seq.Enqueue(new List<Action>() { d, e });
             Assert.IsTrue(d.IsEnqueued &&  d.IsActive && d.countActivate == 1 && d.countDeactivate == 0);
             Assert.IsTrue(e.IsEnqueued && !e.IsActive && e.countActivate == 0 && e.countDeactivate == 0);
 
@@ -175,7 +175,7 @@ namespace SomaSim.AI
             var def = new TestScript("def", d, e, f );
 
             var q = new ScriptQueue();
-            q.Enqueue(new Script[] { abc, empty, def });
+            q.Enqueue(new List<Script>() { abc, empty, def });
 
             // verify the first script and action are active 
             Assert.IsTrue(!q.IsEmpty && q.Head == abc && q.Head.Head == a);
@@ -227,7 +227,7 @@ namespace SomaSim.AI
             var def = new TestScript("def", d, e, f);
 
             var q = new ScriptQueue();
-            q.Enqueue(new Script[] { abc, def });
+            q.Enqueue(new List<Script>() { abc, def });
 
             q.OnUpdate();
             Assert.IsTrue(a.IsEnqueued && a.IsActive && a.IsStarted);
@@ -259,7 +259,7 @@ namespace SomaSim.AI
             var def = new TestScript("def", d, e, f);
 
             var q = new ScriptQueue();
-            q.Enqueue(new Script[] { abc, def });
+            q.Enqueue(new List<Script>() { abc, def });
 
             Assert.IsTrue(a.IsEnqueued && a.IsActive && !a.IsStarted);
 
