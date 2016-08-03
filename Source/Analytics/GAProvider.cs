@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,6 +18,7 @@ namespace SomaSim.Analytics
         private string _uaid;
         private string _cid;
 
+        private MonoBehaviour _runner;
         private GAProviderQueryBuilder _builder;
         private System.Random _rng;
 
@@ -24,7 +26,8 @@ namespace SomaSim.Analytics
 
         private readonly string URL = "http://www.google-analytics.com/collect?";
 
-        public GAProvider (string analyticsID, string clientID) {
+        public GAProvider (string analyticsID, string clientID, MonoBehaviour coroutineRunner) {
+            _runner = coroutineRunner;
             _uaid = analyticsID;
             _cid = clientID;
         }
@@ -79,12 +82,13 @@ namespace SomaSim.Analytics
         private void SendQuery () {
             _builder.AddPair("z", _rng.Next().ToString());
             string query = _builder.ToQueryString(_preamble);
+            _runner.StartCoroutine(DoSend(query));
+        }
 
-#pragma warning disable 0219 // www is assigned but its value is never used
+        private static IEnumerator DoSend (string query) {
             WWW www = new WWW(query);
+            yield return www;
             // aaaand drop any errors on the floor
-#pragma warning restore 0219
-
         }
 
         private StringBuilder _pathsb = new StringBuilder(); // gc helper
