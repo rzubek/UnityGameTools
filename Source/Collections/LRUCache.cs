@@ -17,6 +17,10 @@ namespace SomaSim.Collections
         {
             public K key;
             public V value;
+
+            public static bool KeyEquals (K a, K b) {
+                return EqualityComparer<K>.Default.Equals(a, b);
+            }
         }
 
         /// <summary>
@@ -115,6 +119,30 @@ namespace SomaSim.Collections
         public void Clear () {
             _cacheMap.Clear();
             _lruList.Clear();
+        }
+
+
+        /// <summary>
+        /// Returns true if this cache contains a value with the specified key, 
+        /// and that value is at the specified position in the LRU cache where
+        /// 0 means oldest (least recently used) and Count - 1 means youngest.
+        /// Accessing this function does not affect the key's last access time.
+        /// For internal use only, as this operation is O(n) in cache size.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="i"></param>
+        /// <returns></returns>
+        internal bool ContainsKeyAt (K key, int i) {
+            if (i < 0 || i >= _lruList.Count) {
+                return false;
+            }
+
+            if (! _cacheMap.ContainsKey(key)) {
+                return false;
+            }
+
+            var item = _lruList.ElementAt(i);
+            return Item.KeyEquals(item.key, key);
         }
     }
 }

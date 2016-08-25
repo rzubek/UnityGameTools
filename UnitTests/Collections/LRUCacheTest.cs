@@ -11,28 +11,30 @@ namespace SomaSim.Collections
         [TestMethod]
         public void TestLRUCache () {
 
-            var cache = new LRUCache<string, int>(3); // make a tiny cache
+            var cache = new LRUCache<string, int>(3); // make a tiny cache of three elements
 
             Assert.IsTrue(cache.Capacity == 3 && cache.Count == 0);
+
+            // add three elements
 
             Assert.IsFalse(cache.ContainsKey("one"));
             Assert.IsTrue(cache.Get("one") == 0);
             cache.Add("one", 1);
-            Assert.IsTrue(cache.ContainsKey("one"));
+            Assert.IsTrue(cache.ContainsKeyAt("one", 0));
             Assert.IsTrue(cache.Get("one") == 1);
             Assert.IsTrue(cache.Count == 1);
 
             Assert.IsFalse(cache.ContainsKey("two"));
             Assert.IsTrue(cache.Get("two") == 0);
             cache.Add("two", 2);
-            Assert.IsTrue(cache.ContainsKey("two"));
+            Assert.IsTrue(cache.ContainsKeyAt("two", 1));
             Assert.IsTrue(cache.Get("two") == 2);
             Assert.IsTrue(cache.Count == 2);
 
             Assert.IsFalse(cache.ContainsKey("three"));
             Assert.IsTrue(cache.Get("three") == 0);
             cache.Add("three", 3);
-            Assert.IsTrue(cache.ContainsKey("three"));
+            Assert.IsTrue(cache.ContainsKeyAt("three", 2));
             Assert.IsTrue(cache.Get("three") == 3);
             Assert.IsTrue(cache.Count == 3);
 
@@ -45,16 +47,19 @@ namespace SomaSim.Collections
             Assert.IsTrue(cache.Get("four") == 4);
 
             Assert.IsTrue(cache.Count == 3);
-            Assert.IsTrue(cache.ContainsKey("four"));
-            Assert.IsTrue(cache.ContainsKey("three"));
-            Assert.IsTrue(cache.ContainsKey("two"));
+            Assert.IsTrue(cache.ContainsKeyAt("four", 2));  // from the youngest
+            Assert.IsTrue(cache.ContainsKeyAt("three", 1)); // ...
+            Assert.IsTrue(cache.ContainsKeyAt("two", 0));   // to the oldest
             Assert.IsFalse(cache.ContainsKey("one"));
 
             // now let's touch "two" because that's the least recently used one.
-            // by doing that, we promote "three" to be the least recently used one,
+            // by doing that, we demote "three" to be the least recently used one,
             // and adding a new entry will then evict it.
 
-            Assert.IsTrue(cache.Get("two") == 2); // touch the oldest one
+            Assert.IsTrue(cache.Get("two") == 2); // reading the key will touch it
+            Assert.IsTrue(cache.ContainsKeyAt("two", 2));   // now two is the youngest
+            Assert.IsTrue(cache.ContainsKeyAt("four", 1));  // ...
+            Assert.IsTrue(cache.ContainsKeyAt("three", 0)); // and three is the oldest
 
             Assert.IsTrue(cache.Count == cache.Capacity);
 
@@ -62,10 +67,11 @@ namespace SomaSim.Collections
             Assert.IsTrue(cache.Get("five") == 5);
 
             Assert.IsTrue(cache.Count == 3);
-            Assert.IsTrue(cache.ContainsKey("five"));
-            Assert.IsTrue(cache.ContainsKey("four"));
+            Assert.IsTrue(cache.ContainsKeyAt("five", 2)); // youngest
+            Assert.IsTrue(cache.ContainsKeyAt("two", 1));  // ...
+            Assert.IsTrue(cache.ContainsKeyAt("four", 0)); // oldest
             Assert.IsFalse(cache.ContainsKey("three")); // evicted as lru
-            Assert.IsTrue(cache.ContainsKey("two"));    // still there
+
 
             // finally we remove one item, dropping the count.
             // adding another item will not cause evictions
@@ -80,16 +86,15 @@ namespace SomaSim.Collections
             Assert.IsTrue(cache.Get("six") == 6);
 
             Assert.IsTrue(cache.Count == 3);
-            Assert.IsTrue(cache.ContainsKey("six"));
-            Assert.IsTrue(cache.ContainsKey("five"));
+            Assert.IsTrue(cache.ContainsKeyAt("six", 2));  // youngest
+            Assert.IsTrue(cache.ContainsKeyAt("five", 1)); // ...
+            Assert.IsTrue(cache.ContainsKeyAt("two", 0));  // oldest
             Assert.IsFalse(cache.ContainsKey("four"));   // removed manually
-            Assert.IsTrue(cache.ContainsKey("two"));    // still there
 
             // test clearing
 
             cache.Clear();
             Assert.IsTrue(cache.Count == 0);
-
         }
     }
 }
