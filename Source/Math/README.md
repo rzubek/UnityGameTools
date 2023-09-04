@@ -113,6 +113,37 @@ Assert.IsTrue(t == 625902542);
 ```
 
 
+Mappers
+===
 
+Helper classes for specifying piecewise linear functions and then querying them.
+For example, one might have an interpolating linear function, which takes a series of
+(x, y) points, and then interpolates anything in between, or a step linear function,
+which takes (x, y) points and always returns the y value of the point immediately
+preceding the queried location.
 
+```csharp
 
+var m = new FloatMapper() {
+    x = new List<float> { 0, 1 },
+    y = new List<float> { 0, 1 }
+};
+
+Assert.IsTrue(m.Eval(-10) == 0);
+Assert.IsTrue(m.Eval(0) == 0);
+Assert.IsTrue(m.Eval(0.5f) == 0.5f);
+Assert.IsTrue(m.Eval(1) == 1);
+Assert.IsTrue(m.Eval(10) == 1);
+
+var m = new StepFunctionMapper() {
+    x = new List<float> { 0, 1 },
+    y = new List<float> { 0, 1 }
+};
+
+Assert.IsTrue(m.Eval(-10) == 0);
+Assert.IsTrue(m.Eval(0) == 0);
+Assert.IsTrue(m.Eval(0.5f) == 0);
+Assert.IsTrue(m.Eval(1) == 1);
+Assert.IsTrue(m.Eval(10) == 1);
+
+```

@@ -1,12 +1,15 @@
-﻿using System;
+﻿// Copyright (C) SomaSim LLC. 
+// Open source software. Please see LICENSE file for details.
+
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 
 namespace SomaSim.Util
 {
     /// <summary>
-    /// Very simple implementation of the listener or observable pattern.
+    /// Implementation of the listener pattern that calls listeners in a predictable order,
+    /// and allows for listener list modification in the middle of invocation 
+    /// (any modification in the middle of an invocation will be observed during the next invocation.)
     /// 
     /// Usage: 
     /// <code>
@@ -19,26 +22,18 @@ namespace SomaSim.Util
     /// </summary>
     public class Listeners : List<Action>
     {
+        private List<Action> _copy = new List<Action>();
+
         public void Invoke () {
-            int count = this.Count;
-            for (int i = 0; i < count; i++) {
-                Action a = this[i];
-                a.Invoke();
-
-                CheckCount(count);
-            }
-        }
-
-        [Conditional("UNITY_EDITOR")]
-        private void CheckCount(int count) {
-            if (count != this.Count) {
-                UnityEngine.Debug.LogWarning("Iterator invalidation in Listeners -- Listeners does not support being modified while invoking listeners");
-            }
+            _copy.ClearAndAddRange(this);
+            foreach (var a in _copy) { a.Invoke(); }
         }
     }
 
     /// <summary>
-    /// Very simple implementation of the listener or observable pattern.
+    /// Implementation of the listener pattern that calls listeners in a predictable order,
+    /// and allows for listener list modification in the middle of invocation 
+    /// (any modification in the middle of an invocation will be observed during the next invocation.)
     /// 
     /// Usage: 
     /// <code>
@@ -51,26 +46,18 @@ namespace SomaSim.Util
     /// </summary>
     public class Listeners<T> : List<Action<T>>
     {
+        private List<Action<T>> _copy = new List<Action<T>>();
+
         public void Invoke (T arg) {
-            int count = this.Count;
-            for (int i = 0; i < count; i++) {
-                var a = this[i];
-                a.Invoke(arg);
-
-                CheckCount(count);
-            }
-        }
-
-        [Conditional("UNITY_EDITOR")]
-        private void CheckCount (int count) {
-            if (count != this.Count) {
-                UnityEngine.Debug.LogWarning("Iterator invalidation in Listeners -- Listeners does not support being modified while invoking listeners");
-            }
+            _copy.ClearAndAddRange(this);
+            foreach (var a in _copy) { a.Invoke(arg); }
         }
     }
 
     /// <summary>
-    /// Very simple implementation of the listener or observable pattern.
+    /// Implementation of the listener pattern that calls listeners in a predictable order,
+    /// and allows for listener list modification in the middle of invocation 
+    /// (any modification in the middle of an invocation will be observed during the next invocation.)
     /// 
     /// Usage: 
     /// <code>
@@ -83,27 +70,19 @@ namespace SomaSim.Util
     /// </summary>
     public class Listeners<T1, T2> : List<Action<T1, T2>>
     {
+        private List<Action<T1, T2>> _copy = new List<Action<T1, T2>>();
+
         public void Invoke (T1 arg1, T2 arg2) {
-            int count = this.Count;
-            for (int i = 0; i < count; i++) {
-                var a = this[i];
-                a.Invoke(arg1, arg2);
-
-                CheckCount(count);
-            }
-        }
-
-        [Conditional("UNITY_EDITOR")]
-        private void CheckCount (int count) {
-            if (count != this.Count) {
-                UnityEngine.Debug.LogWarning("Iterator invalidation in Listeners -- Listeners does not support being modified while invoking listeners");
-            }
+            _copy.ClearAndAddRange(this);
+            foreach (var a in _copy) { a.Invoke(arg1, arg2); }
         }
     }
 
 
     /// <summary>
-    /// Very simple implementation of the listener or observable pattern.
+    /// Implementation of the listener pattern that calls listeners in a predictable order,
+    /// and allows for listener list modification in the middle of invocation 
+    /// (any modification in the middle of an invocation will be observed during the next invocation.)
     /// 
     /// Usage: 
     /// <code>
@@ -116,21 +95,11 @@ namespace SomaSim.Util
     /// </summary>
     public class Listeners<T1, T2, T3> : List<Action<T1, T2, T3>>
     {
+        private List<Action<T1, T2, T3>> _copy = new List<Action<T1, T2, T3>>();
+
         public void Invoke (T1 arg1, T2 arg2, T3 arg3) {
-            int count = this.Count;
-            for (int i = 0; i < count; i++) {
-                var a = this[i];
-                a.Invoke(arg1, arg2, arg3);
-
-                CheckCount(count);
-            }
-        }
-
-        [Conditional("UNITY_EDITOR")]
-        private void CheckCount (int count) {
-            if (count != this.Count) {
-                UnityEngine.Debug.LogWarning("Iterator invalidation in Listeners -- Listeners does not support being modified while invoking listeners");
-            }
+            _copy.ClearAndAddRange(this);
+            foreach (var a in _copy) { a.Invoke(arg1, arg2, arg3); }
         }
     }
 }

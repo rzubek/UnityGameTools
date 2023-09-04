@@ -1,13 +1,16 @@
-﻿using System;
+﻿// Copyright (C) SomaSim LLC. 
+// Open source software. Please see LICENSE file for details.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using UnityEngine;
 
-namespace SomaSim.Math
+namespace SomaSim.Util
 {
     /// <summary>
-    /// Piecewise linear function that maps floats to T
+    /// Piecewise linear function that takes a mapping from floats to T, 
+    /// and can be queried for any float values in between those specified.
     /// </summary>
     public abstract class PiecewiseLinearMapper<T>
     {
@@ -24,20 +27,19 @@ namespace SomaSim.Math
         /// <summary>
         /// Returns true if this mapper is empty, ie. contains no data points, and cannot be used.
         /// </summary>
-        /// <returns></returns>
-        public bool IsEmpty { get { return x.Count == 0 || y.Count == 0; } }
+        public bool IsEmpty => x.Count == 0 || y.Count == 0;
 
         /// <summary>
         /// Given some input x value, find an appropriate y value given 
         /// the piecewise linear function. This function is linear in the number of points in the function.
         /// </summary>
-        /// <param name="input"></param>
-        /// <returns></returns>
         abstract public T Eval (float input);
     }
 
     /// <summary>
     /// Base class for piecewise linear functions that interpolate between specified points.
+    /// For example, given points (0, 0) and (1, 1), the mapper will return y = 0 for
+    /// x in [-inf, 0], y = x in [0, 1], and y = 1 for x in [1, inf]
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public abstract class InterpolatingPiecewiseLinearMapper<T> : PiecewiseLinearMapper<T>
@@ -78,8 +80,8 @@ namespace SomaSim.Math
         /// <inheritDoc/>
         override protected float Interpolate (float x, float x0, float x1, float y0, float y1) {
             float p = (x - x0) / (x1 - x0);
-			return y0 + (y1 - y0) * p;
-		}
+            return y0 + (y1 - y0) * p;
+        }
     }
 
 
@@ -90,7 +92,7 @@ namespace SomaSim.Math
     {
         public void InitFromHexStrings (List<float> xs, List<string> colors) {
             this.x = xs;
-            this.y = colors.Select<string,Color32>(ColorUtil.HexToColor).ToList();
+            this.y = colors.Select(ColorUtil.HexToColor).ToList();
         }
 
         /// <inheritDoc/>

@@ -1,7 +1,7 @@
-﻿using System;
-using Game.Util;
+﻿// Copyright (C) SomaSim LLC. 
+// Open source software. Please see LICENSE file for details.
 
-namespace SomaSim.Math
+namespace SomaSim.Util
 {
     [TestClass]
     public class MathUtilTest
@@ -74,36 +74,36 @@ namespace SomaSim.Math
         public void TestEvenOdd () {
             Assert.IsTrue(MathUtil.IsEven(-2));
             Assert.IsTrue(MathUtil.IsEven(0));
-            Assert.IsTrue(MathUtil.IsEven((uint)2));
+            Assert.IsTrue(MathUtil.IsEven((uint) 2));
             Assert.IsTrue(MathUtil.IsEven(2f));
             Assert.IsTrue(MathUtil.IsEven(2.1f));
             Assert.IsFalse(MathUtil.IsOdd(-2));
             Assert.IsFalse(MathUtil.IsOdd(0));
-            Assert.IsFalse(MathUtil.IsOdd((uint)2));
+            Assert.IsFalse(MathUtil.IsOdd((uint) 2));
             Assert.IsFalse(MathUtil.IsOdd(2f));
             Assert.IsFalse(MathUtil.IsOdd(2.1f));
 
             Assert.IsTrue(MathUtil.IsOdd(-1));
             Assert.IsTrue(MathUtil.IsOdd(1));
-            Assert.IsTrue(MathUtil.IsOdd((uint)1));
+            Assert.IsTrue(MathUtil.IsOdd((uint) 1));
             Assert.IsTrue(MathUtil.IsOdd(1f));
             Assert.IsTrue(MathUtil.IsOdd(1.1f));
             Assert.IsFalse(MathUtil.IsEven(-1));
             Assert.IsFalse(MathUtil.IsEven(1));
-            Assert.IsFalse(MathUtil.IsEven((uint)1));
+            Assert.IsFalse(MathUtil.IsEven((uint) 1));
             Assert.IsFalse(MathUtil.IsEven(1f));
             Assert.IsFalse(MathUtil.IsEven(1.1f));
         }
 
         [TestMethod]
         public void TestInterpolateAndInverse () {
-            Assert.IsTrue(MathUtil.Interpolate(  0f, -10, 10) == -10);
+            Assert.IsTrue(MathUtil.Interpolate(0f, -10, 10) == -10);
             Assert.IsTrue(MathUtil.Interpolate(0.5f, -10, 10) == 0);
-            Assert.IsTrue(MathUtil.Interpolate(  1f, -10, 10) == 10);
+            Assert.IsTrue(MathUtil.Interpolate(1f, -10, 10) == 10);
 
             Assert.IsTrue(MathUtil.Uninterpolate(-10, -10, 10) == 0f);
-            Assert.IsTrue(MathUtil.Uninterpolate(  0, -10, 10) == 0.5f);
-            Assert.IsTrue(MathUtil.Uninterpolate( 10, -10, 10) == 1f);
+            Assert.IsTrue(MathUtil.Uninterpolate(0, -10, 10) == 0.5f);
+            Assert.IsTrue(MathUtil.Uninterpolate(10, -10, 10) == 1f);
         }
 
         [TestMethod]
@@ -135,6 +135,20 @@ namespace SomaSim.Math
             Assert.IsTrue(MathUtil.CountIntervals(5f, 10f, 5f) == 1);
             Assert.IsTrue(MathUtil.CountIntervals(5f, 11f, 5f) == 1);
             Assert.IsTrue(MathUtil.CountIntervals(3f, 10f, 5f) == 2);
+        }
+
+        [TestMethod]
+        public void TestOthers () {
+            {
+                float a = 1, b = 2;
+                MathUtil.Swap(ref a, ref b);
+                Assert.IsTrue(a == 2 && b == 1);
+            }
+            {
+                int a = 1, b = 2;
+                MathUtil.Swap(ref a, ref b);
+                Assert.IsTrue(a == 2 && b == 1);
+            }
         }
     }
 }
