@@ -5,13 +5,17 @@ Collection of various tools we use in Unity3D game development.
 
 
 Quick overview of what's here:
-*   [Collections](Source/Collections) contains a few data structures, such as smart queues and stacks, that simplify gamedev life
-*   [Dataflow](Source/Dataflow) contains helpers for reactive/dataflow programming
-*   [Math](Source/Math) contains a C# port of the Tiny Mersenne Twister random number generator, plus other math utilities
-*   [ObjectPool](Source/ObjectPool) has a simple and straightforward object pool manager 
-*   [Serializer](Source/Serializer) that will serialize typed objects into "typed" JSON and deserialize them back - useful for loading up game config files, or for save file implementation
-*   [Services](Source/Services) contains basic setup for global services, and an input manager service
-*   [Testing](Source/Testing) is a unit test harness that will load and run specially-marked-up class methods at game startup time
+* [Collections](Source/Collections) contains a few data structures, such as smart queues and stacks, that simplify gamedev life
+* [Math](Source/Math) contains numerous math utilities
+	* Several random number generators, including Xorshift and the Tiny Mersenne Twister
+	* Hashing functions
+	* `Fixnum`, a fixed-point fractional type
+	* Various clamping/snapping/interpolation/uninterpolation utilities
+	* And more
+* [ObjectPool](Source/ObjectPool) has a simple and straightforward object pool manager 
+* [Serializer](Source/Serializer) that will serialize typed objects into "typed" JSON and deserialize them back - useful for loading up game config files, or for save file implementation
+* [Services](Source/Services) contains basic setup for global services, and an input manager service
+* [Testing](Source/Testing) is a unit test harness that will load and run specially-marked-up class methods at game startup time
 
 
 

@@ -1,9 +1,10 @@
-﻿using System;
+﻿// Copyright (C) SomaSim LLC. 
+// Open source software. Please see LICENSE file for details.
 
-namespace SomaSim.Math
+namespace SomaSim.Util
 {
     [TestClass]
-    public class TinyMTTest
+    public class RandomTest
     {
         [TestMethod]
         public void TestTinyMT () {
@@ -46,8 +47,9 @@ namespace SomaSim.Math
             rand.Init(1);
             Assert.IsTrue(rand.PickElement(new uint[] { 0, 1, 2, 3, 4 }) == 4); // 2545341989 % 5 = 4, so 4th element
 
-            rand.Init(1); 
-            Assert.IsTrue(rand.DieRoll(10) == 10); // last digit of 2545341989 plus one
+            rand.Init(1);
+            var roll = rand.DieRoll(10);
+            Assert.IsTrue(roll == 9); // last digit of 2545341989 
 
             RandomRange range = new RandomRange(0, 10, 3);
             rand.Init(1);
@@ -56,7 +58,21 @@ namespace SomaSim.Math
             // third random number: 3715302833 % 10 = 3
             // total: 15, over three passes: result = 5
             Assert.IsTrue(rand.Generate(range) == 5);
+        }
 
+        [TestMethod]
+        public void TestHashUtil () {
+            // test consecutive inputs producing non-consecutive hashes
+            uint a = HashUtil.Hash(1), b = HashUtil.Hash(2), c = HashUtil.Hash(3);
+            Assert.IsTrue(a == 2298633409);
+            Assert.IsTrue(b == 479680206);
+            Assert.IsTrue(c == 3674312685);
+
+            // test string hashing, also well-distributed
+            // and remains the same across .net versions and platforms
+            uint s = HashUtil.Hash("Hello1"), t = HashUtil.Hash("Hello2");
+            Assert.IsTrue(s == 925636315);
+            Assert.IsTrue(t == 625902542);
         }
     }
 }

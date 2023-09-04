@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿// Copyright (C) SomaSim LLC. 
+// Open source software. Please see LICENSE file for details.
 
-namespace SomaSim.Math
+namespace SomaSim.Util
 {
     public class BitwiseUtil
     {
-
-
-
         /// <summary>
         /// Reverses bits in the specified unsigned integer.
         /// 
@@ -33,7 +28,7 @@ namespace SomaSim.Math
         /// the result of shuffling will be <b> aAbB cCdD eEfF gGhH iIjJ kKlL mMnN oOpP </b>.   
         /// </summary>
         public static uint ShuffleBits (uint x) {
-            uint t = 0;
+            uint t;
             t = (x ^ (x >> 8)) & 0x0000ff00; x = x ^ t ^ (t << 8);
             t = (x ^ (x >> 4)) & 0x00f000f0; x = x ^ t ^ (t << 4);
             t = (x ^ (x >> 2)) & 0x0c0c0c0c; x = x ^ t ^ (t << 2);
@@ -47,7 +42,7 @@ namespace SomaSim.Math
         /// the result of unshuffling will be <b> abcd efgh ijkl mnop ABCD EFGH IJKL MNOP </b>.   
         /// </summary>
         public static uint UnshuffleBits (uint x) {
-            uint t = 0;
+            uint t;
             t = (x ^ (x >> 1)) & 0x22222222; x = x ^ t ^ (t << 1);
             t = (x ^ (x >> 2)) & 0x0c0c0c0c; x = x ^ t ^ (t << 2);
             t = (x ^ (x >> 4)) & 0x00f000f0; x = x ^ t ^ (t << 4);
