@@ -1,6 +1,7 @@
-﻿using System;
+﻿// Copyright (C) SomaSim LLC. 
+// Open source software. Please see LICENSE file for details.
 
-namespace SomaSim.Utils
+namespace SomaSim.Util
 {
     public class TestElement : IObjectPoolElement
     {

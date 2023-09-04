@@ -1,16 +1,17 @@
-﻿using System;
+﻿// Copyright (C) SomaSim LLC. 
+// Open source software. Please see LICENSE file for details.
 
-namespace SomaSim.Collections
+namespace SomaSim.Util
 {
     [TestClass]
     public class SmartStackTest
     {
         internal class TestEntry : AbstractSmartStackElement
         {
-            public int activationCount { get; private set; }
-            public int deactivationCount { get; private set; }
-            public int pushCount { get; private set; }
-            public int popCount { get; private set; }
+            public int activationCount;
+            public int deactivationCount;
+            public int pushCount;
+            public int popCount;
 
             public SmartStack<TestEntry> container { get { return this.Stack as SmartStack<TestEntry>; } }
 
@@ -19,14 +20,14 @@ namespace SomaSim.Collections
                 pushCount++;
             }
 
-            public override void OnActivated () {
-                base.OnActivated();
+            public override void OnActivated (bool pushed) {
+                base.OnActivated(pushed);
                 activationCount++;
             }
 
-            public override void OnDeactivated () {
+            public override void OnDeactivated (bool popped) {
                 deactivationCount++;
-                base.OnDeactivated();
+                base.OnDeactivated(popped);
             }
 
             public override void OnPopped () {

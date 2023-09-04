@@ -1,9 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿// Copyright (C) SomaSim LLC. 
+// Open source software. Please see LICENSE file for details.
 
-namespace SomaSim.Utils
+using System;
+using System.Collections.Generic;
+
+namespace SomaSim.Util
 {
     /// <summary>
     /// Interface for objects managed by an object pool. 
@@ -40,15 +41,13 @@ namespace SomaSim.Utils
         /// </summary>
         private int _usedcount;
 
-        public int UsedListSize { get { return _usedcount; } }
-        public int FreeListSize { get { return _free != null ? _free.Count : -1; } }
+        public int UsedListSize => _usedcount;
+        public int FreeListSize => _free != null ? _free.Count : -1;
 
         /// <summary>
         /// Initializes the object pool.
         /// </summary>
-        public void Initialize () {
-            Initialize(() => new T());
-        }
+        public void Initialize () => Initialize(() => new T());
 
         /// <summary>
         /// Initializes the object pool with a specific factory for new elements
@@ -96,30 +95,40 @@ namespace SomaSim.Utils
     /// getting garbage collected.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class ObjectPoolResettable<T> 
+    public class ObjectPoolResettable<T>
     {
         /// <summary>
         /// Function that generates instances of T
         /// </summary>
-        private Func<T> _factory;
+        private Func<T> _factoryFn;
 
         /// <summary>
-        /// Function that resets the instance of T after it's been free'd
+        /// Function that activates an instance of T after it's been allocated (new or reused). Optional.
         /// </summary>
-        private Action<T> _reset;
+        private Action<T> _activateFn;
+
+        /// <summary>
+        /// Function that resets the instance of T after it's been free'd.
+        /// </summary>
+        private Action<T> _resetFn;
+
+        /// <summary>
+        /// Function that destroys a freed instance of T when shutting down
+        /// </summary>
+        private Action<T> _destroyFn;
 
         /// <summary>
         /// List of all entries returned from circulation, and ready for reuse.
         /// </summary>
-        private Stack<T> _free;
+        private List<T> _free;
 
         /// <summary>
         /// Number of elements currently in circulation, that haven't been returned.
         /// </summary>
         private int _usedcount;
 
-        public int UsedListSize { get { return _usedcount; } }
-        public int FreeListSize { get { return _free != null ? _free.Count : -1; } }
+        public int UsedListSize => _usedcount;
+        public int FreeListSize => _free != null ? _free.Count : -1;
 
         /// <summary>
         /// Initializes the object pool with a specific factory for new elements
@@ -127,19 +136,26 @@ namespace SomaSim.Utils
         /// and a reset function that will be called on each free'd element.
         /// </summary>
         /// <param name="factory"></param>
-        public void Initialize (Func<T> factory, Action<T> reset) {
-            _factory = factory;
-            _reset = reset;
-            _free = new Stack<T>();
+        public void Initialize (Func<T> factory, Action<T> activate, Action<T> reset, Action<T> destroy) {
+            _factoryFn = factory;
+            _activateFn = activate;
+            _resetFn = reset;
+            _destroyFn = destroy;
+            _free = new List<T>();
         }
 
         /// <summary>
         /// Releases all elements and resources held by this pool.
         /// </summary>
         public void Release () {
-            _free.Clear();
+            while (_free.Count > 0) {
+                _destroyFn(_free.RemoveLast());
+            }
+
             _free = null;
-            _factory = null;
+            _destroyFn = null;
+            _activateFn = null;
+            _factoryFn = null;
         }
 
         /// <summary>
@@ -148,8 +164,9 @@ namespace SomaSim.Utils
         /// </summary>
         /// <returns></returns>
         public T Allocate () {
-            T element = (_free.Count > 0) ? _free.Pop() : _factory.Invoke();
+            T element = (_free.Count > 0) ? _free.RemoveLast() : _factoryFn.Invoke();
             _usedcount++;
+            _activateFn?.Invoke(element);
             return element;
         }
 
@@ -158,9 +175,9 @@ namespace SomaSim.Utils
         /// </summary>
         /// <param name="element"></param>
         public void Free (T element) {
-            _reset(element);
+            _resetFn?.Invoke(element);
             _usedcount--;
-            _free.Push(element);
+            _free.Add(element);
         }
     }
 

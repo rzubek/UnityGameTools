@@ -1,10 +1,11 @@
-﻿using System;
+﻿// Copyright (C) SomaSim LLC. 
+// Open source software. Please see LICENSE file for details.
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
-namespace SomaSim.Collections
+namespace SomaSim.Util
 {
     /// <summary>Represents a list collection of objects that can also be accessed as a double-ended queue</summary>
     /// <typeparam name="T">Specifies the type of elements in the queue.</typeparam>
@@ -12,33 +13,34 @@ namespace SomaSim.Collections
     public class Deque<T> : IEnumerable<T>, ICollection, IEnumerable
     {
         // internally, the deque is stored as a list, where _head points to the first element
-        
-        private T[] array;
-        private int head;
-        private int size;
-        private int version;
+
+        private T[] _array;
+        private int _head;
+        private int _size;
+        private int _version;
 
         /// <summary>Gets a value indicating whether access to the <see cref="T:System.Collections.ICollection" /> 
         /// is synchronized (thread safe).</summary>
-        /// <returns>true if access to the <see cref="T:System.Collections.ICollection" /> is synchronized (thread safe); otherwise, false.  In the default implementation of deque, this property always returns false.</returns>
-        bool ICollection.IsSynchronized { get { return false; } }
+        /// <returns>true if access to the <see cref="T:System.Collections.ICollection" /> is synchronized (thread safe); otherwise, false.
+        /// In the default implementation of deque, this property always returns false.</returns>
+        bool ICollection.IsSynchronized => false;
 
         /// <summary>Gets an object that can be used to synchronize access to the 
         /// <see cref="T:System.Collections.ICollection" />.</summary>
         /// <returns>An object that can be used to synchronize access to the 
         /// <see cref="T:System.Collections.ICollection" />.  In the default implementation of deque, 
         /// this property always returns the current instance.</returns>
-        object ICollection.SyncRoot { get { return this; } }
+        object ICollection.SyncRoot => this;
 
         /// <summary>Gets the number of elements contained in the deque.</summary>
         /// <returns>The number of elements contained in the deque.</returns>
-        public int Count { get { return size; } }
+        public int Count => _size;
 
-        internal int Capacity { get { return array.Length; } }
+        internal int Capacity => _array.Length;
 
         /// <summary>Initializes a new instance of the deque class that is empty and has the default initial capacity.</summary>
         public Deque () {
-            array = new T[0];
+            _array = new T[0];
         }
 
         /// <summary>Initializes a new instance of the deque class with specified capacity.</summary>
@@ -49,7 +51,7 @@ namespace SomaSim.Collections
             if (capacity < 0) {
                 throw new ArgumentOutOfRangeException("count");
             }
-            array = new T[capacity];
+            _array = new T[capacity];
         }
 
         /// <summary>Initializes a new instance of the deque class that contains elements copied from the specified collection.</summary>
@@ -61,9 +63,8 @@ namespace SomaSim.Collections
                 throw new ArgumentNullException("collection");
             }
 
-            ICollection<T> icoll = collection as ICollection<T>;
-            int num = (icoll == null) ? 0 : icoll.Count;
-            array = new T[num];
+            int num = collection is ICollection<T> icoll ? icoll.Count : 0;
+            _array = new T[num];
             foreach (T current in collection) {
                 AddLast(current);
             }
@@ -86,51 +87,57 @@ namespace SomaSim.Collections
         void ICollection.CopyTo (Array target, int index) {
             if (target == null) { throw new ArgumentNullException("array"); }
             if (index > target.Length) { throw new ArgumentOutOfRangeException("index"); }
-            if (target.Length - index < size) { throw new ArgumentException(); }
+            if (target.Length - index < _size) { throw new ArgumentException(); }
 
-            if (size == 0) {
-                return;
-            }
+            if (_size == 0) { return; }
 
             try {
-                int lengthFromHead = array.Length - head;
-                Array.Copy(array, head, target, index, System.Math.Min(size, lengthFromHead));
-                if (this.size > lengthFromHead) {
-                    Array.Copy(this.array, 0, target, index + lengthFromHead, size - lengthFromHead);
+                int lengthFromHead = _array.Length - _head;
+                Array.Copy(_array, _head, target, index, Math.Min(_size, lengthFromHead));
+                if (this._size > lengthFromHead) {
+                    Array.Copy(this._array, 0, target, index + lengthFromHead, _size - lengthFromHead);
                 }
             } catch (ArrayTypeMismatchException) {
                 throw new ArgumentException();
             }
         }
 
-        IEnumerator<T> IEnumerable<T>.GetEnumerator () { return GetEnumerator(); }
+        IEnumerator<T> IEnumerable<T>.GetEnumerator () => GetEnumerator();
 
         /// <summary>Returns an enumerator that iterates through a collection.</summary>
         /// <returns>An <see cref="T:System.Collections.IEnumerator" /> that can be used to iterate through the collection.</returns>
-        IEnumerator IEnumerable.GetEnumerator () { return GetEnumerator(); }
+        IEnumerator IEnumerable.GetEnumerator () => GetEnumerator();
 
         /// <summary>Removes all objects from the deque.</summary>
         /// <filterpriority>1</filterpriority>
         public void Clear () {
-            Array.Clear(array, 0, array.Length);
-            head = size = 0;
-            version++;
+            Array.Clear(_array, 0, _array.Length);
+            _head = _size = 0;
+            _version++;
         }
 
         /// <summary>Determines whether an element is in the deque.</summary>
         /// <returns>true if <paramref name="item" /> is found in the deque; otherwise, false.</returns>
         /// <param name="item">The object to locate in the deque. The value can be null for reference types.</param>
         public bool Contains (T item) {
-            if (item == null) {
-                foreach (T current in this) {
-                    if (current == null) { return true; }
-                }
-            } else {
-                foreach (T current in this) {
-                    if (item.Equals(current)) { return true; }
+            int index = IndexOf(item);
+            return index >= 0;
+        }
+
+        /// <summary>Returns the internal array index of the item in question </summary>
+        private int IndexOf (T item) {
+            var length = _array.Length;
+            EqualityComparer<T> @default = EqualityComparer<T>.Default;
+
+            for (int i = 0; i < _size; i++) {
+                int index = (_head + i) % length;
+                T current = _array[index];
+                if (@default.Equals(current, item)) {
+                    return index;
                 }
             }
-            return false;
+
+            return -1;
         }
 
         /// <summary>Copies the deque elements to an existing one-dimensional <see cref="T:System.Array" />, starting at the specified array index.</summary>
@@ -143,119 +150,138 @@ namespace SomaSim.Collections
         /// <exception cref="T:System.ArgumentException">The number of elements in the source deque is greater than the available space from <paramref name="arrayIndex" /> to the end of the destination <paramref name="array" />.</exception>
         public void CopyTo (T[] array, int idx) {
             if (array == null) { throw new ArgumentNullException(); }
-            ((ICollection)this).CopyTo(array, idx);
+            ((ICollection) this).CopyTo(array, idx);
         }
 
         /// <summary>Removes and returns the object at the beginning of the deque.</summary>
         /// <returns>The object that is removed from the beginning of the deque.</returns>
         /// <exception cref="T:System.InvalidOperationException">The deque is empty.</exception>
-        public T RemoveFirst() { 
+        public T RemoveFirst () {
             T result = PeekFirst();
 
-            array[head] = default(T); // gc helper
+            _array[_head] = default; // gc helper
 
-            head = (head + 1) % array.Length;
-            size--;
-            version++;
+            _head = (_head + 1) % _array.Length;
+            _size--;
+            _version++;
             return result;
         }
+
+        /// <summary> Returns the index of the last item in the array (wrapped around) </summary>
+        private int Last => (_head + _size - 1) % _array.Length;
 
         /// <summary>Removes and returns the object at the end of the deque.</summary>
         /// <returns>The object that is removed from the end of the deque.</returns>
         /// <exception cref="T:System.InvalidOperationException">The deque is empty.</exception>
         public T RemoveLast () {
             T result = PeekLast();
+            _array[Last] = default; // gc helper
 
-            int last = (head + size - 1) % array.Length;
-            array[last] = default(T); // gc helper
-
-            size--;
-            version++;
+            _size--;
+            _version++;
             return result;
+        }
+
+        /// <summary>If the object exists in the queue, it swap-removes the first encountered
+        /// instance (ie. it moves the last element into the object's position, thus overwriting it)
+        /// and returns true. If object was not found, returns false.
+        /// </summary>
+        public bool SwapRemove (T item) {
+            int index = IndexOf(item);
+            if (index < 0) {
+                return false;
+            }
+
+            // drop the last item into this slot
+            _array[index] = _array[Last];
+            _array[Last] = default; // gc helper
+
+            _size--;
+            _version++;
+            return true;
         }
 
         /// <summary>Returns the object at the beginning of the deque without removing it.</summary>
         /// <returns>The object at the beginning of the deque.</returns>
         /// <exception cref="T:System.InvalidOperationException">The deque is empty.</exception>
         public T PeekFirst () {
-            if (size == 0) { throw new InvalidOperationException(); }
-            return array[head];
+            if (_size == 0) { throw new InvalidOperationException(); }
+            return _array[_head];
         }
 
         /// <summary>Returns the object at the end of the deque without removing it.</summary>
         /// <returns>The object at the beginning of the deque.</returns>
         /// <exception cref="T:System.InvalidOperationException">The deque is empty.</exception>
         public T PeekLast () {
-            if (size == 0) { throw new InvalidOperationException(); }
-            int last = (head + size - 1) % array.Length;
-            return array[last];
+            if (_size == 0) { throw new InvalidOperationException(); }
+            return _array[Last];
         }
 
         /// <summary>Adds an object to the end of the deque.</summary>
-        /// <param name="item">The object to add to the deque. The value can be null for reference types.</param>
+        /// <param name="item">The object to add to the deque.</param>
         public void AddLast (T item) {
-            if (size == array.Length) { SetCapacity(System.Math.Max(size * 2, 4)); }
+            if (_size == _array.Length) { SetCapacity(Math.Max(_size * 2, 4)); }
 
-            int next = (head + size) % array.Length;
-            array[next] = item;
+            int next = (_head + _size) % _array.Length;
+            _array[next] = item;
 
-            size++;
-            version++;
+            _size++;
+            _version++;
         }
 
         /// <summary>Adds an object to the front of the deque.</summary>
-        /// <param name="item">The object to add to the deque. The value can be null for reference types.</param>
+        /// <param name="item">The object to add to the deque.</param>
         public void AddFirst (T item) {
-            if (size == array.Length) { SetCapacity(System.Math.Max(size * 2, 4)); }
+            if (_size == _array.Length) { SetCapacity(Math.Max(_size * 2, 4)); }
 
-            if (--head < 0) {
-                head = array.Length - 1;
+            if (--_head < 0) {
+                _head = _array.Length - 1;
             }
 
-            array[head] = item;
-            size++;
-            version++;
+            _array[_head] = item;
+            _size++;
+            _version++;
         }
 
         /// <summary>Copies the deque elements to a new array.</summary>
         /// <returns>A new array containing elements copied from the deque.</returns>
         public T[] ToArray () {
-            T[] newarray = new T[size];
+            T[] newarray = new T[_size];
             CopyTo(newarray, 0);
             return newarray;
         }
 
-        /// <summary>Sets the capacity to the actual number of elements in the deque, if that number is less than 90 percent of current capacity.</summary>
-        public void TrimExcess () {
-            if (size < array.Length * 0.9) {
-                SetCapacity(size);
+        /// <summary>Sets the capacity to the actual number of elements in the deque,
+        /// if that number is less than 90 percent of current capacity, and if
+        /// current capacity is greater than the specified threshold.</summary>
+        public void TrimExcess (int threshold = 4) {
+            if (_size < _array.Length * 0.9 && _array.Length > threshold) {
+                SetCapacity(_size);
             }
         }
 
         private void SetCapacity (int newSize) {
-            if (newSize == array.Length) {
+            if (newSize == _array.Length) {
                 return;
             }
 
-            if (newSize < size) {
+            if (newSize < _size) {
                 throw new InvalidOperationException("Cannot set capacity below current number of elements");
             }
 
             T[] newarray = new T[newSize];
-            if (size > 0) {
+            if (_size > 0) {
                 CopyTo(newarray, 0);
             }
 
-            array = newarray;
-            head = 0;
-            version++;
+            _array = newarray;
+            _head = 0;
+            _version++;
         }
 
         /// <summary>Returns an enumerator that iterates through the deque.</summary>
         /// <returns>An enumerator for the deque.</returns>
-        public Deque<T>.Enumerator GetEnumerator () {
-            return new Deque<T>.Enumerator(this);
-        }
+        public Enumerator GetEnumerator () => new Enumerator(this);
 
 
         /// <summary>Enumerates the elements.</summary>
@@ -265,21 +291,21 @@ namespace SomaSim.Collections
             private const int NOT_STARTED = -2;
             private const int FINISHED = -1;
 
-            private Deque<T> d;
-            private int index;
-            private int version;
+            private Deque<T> _d;
+            private int _index;
+            private int _version;
 
             internal Enumerator (Deque<T> deq) {
-                index = NOT_STARTED;
-                d = deq;
-                version = deq.version;
+                _index = NOT_STARTED;
+                _d = deq;
+                _version = deq._version;
             }
 
             /// <summary>Gets the element at the current position of the enumerator.</summary>
             /// <returns>The element in the collection at the current position of the enumerator.</returns>
             /// <exception cref="T:System.InvalidOperationException">The enumerator is positioned 
             /// before the first element of the collection or after the last element. </exception>
-            object IEnumerator.Current { get { return this.Current; } }
+            object IEnumerator.Current => Current;
 
             /// <summary>Gets the element at the current position of the enumerator.</summary>
             /// <returns>The element in the deque at the current position of the enumerator.</returns>
@@ -287,11 +313,11 @@ namespace SomaSim.Collections
             /// before the first element of the collection or after the last element. </exception>
             public T Current {
                 get {
-                    if (index < 0) { throw new InvalidOperationException(); }
+                    if (_index < 0) { throw new InvalidOperationException(); }
 
-                    int last = d.head + d.size - 1;
-                    int deqindex = (last - index) % d.array.Length;
-                    return d.array[deqindex];
+                    int last = _d._head + _d._size - 1;
+                    int deqindex = (last - _index) % _d._array.Length;
+                    return _d._array[deqindex];
                 }
             }
 
@@ -299,14 +325,12 @@ namespace SomaSim.Collections
             /// <exception cref="T:System.InvalidOperationException">The collection was modified 
             /// after the enumerator was created. </exception>
             void IEnumerator.Reset () {
-                if (version != d.version) { throw new InvalidOperationException(); }
-                index = NOT_STARTED;
+                if (_version != _d._version) { throw new InvalidOperationException(); }
+                _index = NOT_STARTED;
             }
 
             /// <summary>Releases all resources used by the enumerator.</summary>
-            public void Dispose () {
-                index = NOT_STARTED; //? FINISHED?
-            }
+            public void Dispose () => _index = NOT_STARTED; //? FINISHED?
 
             /// <summary>Advances the enumerator to the next element of the deque.</summary>
             /// <returns>true if the enumerator was successfully advanced to the next element; 
@@ -314,13 +338,13 @@ namespace SomaSim.Collections
             /// <exception cref="T:System.InvalidOperationException">The collection was modified 
             /// after the enumerator was created. </exception>
             public bool MoveNext () {
-                if (version != d.version) { throw new InvalidOperationException(); }
+                if (_version != _d._version) { throw new InvalidOperationException(); }
 
-                if (index == NOT_STARTED) {
-                    index = d.size;
+                if (_index == NOT_STARTED) {
+                    _index = _d._size;
                 }
 
-                return index != FINISHED && --index != FINISHED;
+                return _index != FINISHED && --_index != FINISHED;
             }
         }
 

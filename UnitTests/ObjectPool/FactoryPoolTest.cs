@@ -1,14 +1,15 @@
-﻿using System;
+﻿// Copyright (C) SomaSim LLC. 
+// Open source software. Please see LICENSE file for details.
 
-namespace SomaSim.Utils
+namespace SomaSim.Util
 {
     [TestClass]
     public class FactoryPoolTest
     {
         [TestMethod]
         public void TestAllocateAndFree () {
-            var pool = new StringBuilderPool();
-            pool.Initialize();
+            StringBuilderPool.Reset();
+            StringBuilderPool pool = StringBuilderPool.Instance;
 
             Assert.IsTrue(pool.UsedListSize == 0 && pool.FreeListSize == 0);
 
@@ -31,12 +32,14 @@ namespace SomaSim.Utils
             Assert.IsTrue(pool.UsedListSize == 2 && pool.FreeListSize == 0);
             Assert.IsTrue(sb3 == sb2);
             Assert.IsTrue(sb4 == sb1);
+
+            StringBuilderPool.Reset();
         }
 
         [TestMethod]
         public void TestReset () {
-            var pool = new StringBuilderPool();
-            pool.Initialize();
+            StringBuilderPool.Reset();
+            StringBuilderPool pool = StringBuilderPool.Instance;
 
             // allocate a new string builder and make sure we use it
             var sb1 = pool.Allocate();
@@ -53,12 +56,14 @@ namespace SomaSim.Utils
             var sb2 = pool.Allocate();
             Assert.IsTrue(sb1 == sb2);
             Assert.IsTrue(sb2.Length == 0); // and it's been reset
+
+            StringBuilderPool.Reset();
         }
 
         [TestMethod]
         public void TestPoolRelease () {
-            var pool = new StringBuilderPool();
-            pool.Initialize();
+            StringBuilderPool.Reset();
+            StringBuilderPool pool = StringBuilderPool.Instance;
 
             // allocate a new instance using this custom factory, make sure the factory code got called
             var sb1 = pool.Allocate();
@@ -77,6 +82,8 @@ namespace SomaSim.Utils
             Assert.IsTrue(sb1.Length == 3);
             Assert.IsTrue(pool.UsedListSize == 1);
             Assert.IsTrue(pool.FreeListSize == -1);
+
+            StringBuilderPool.Reset();
         }
     }
 }

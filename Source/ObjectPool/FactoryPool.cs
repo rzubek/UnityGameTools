@@ -1,9 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿// Copyright (C) SomaSim LLC. 
+// Open source software. Please see LICENSE file for details.
 
-namespace SomaSim.Utils
+using System;
+using System.Collections.Generic;
+
+namespace SomaSim.Util
 {
     /// <summary>
     /// Object factory pool manages a number of factories, which can be reset and reused.
@@ -44,7 +45,7 @@ namespace SomaSim.Utils
         /// and then reset the factory.
         /// </summary>
         /// <param name="creator"></param>
-        public void Initialize (Func<T> creator, Func<T,S> finalizer) {
+        public void Initialize (Func<T> creator, Func<T, S> finalizer) {
             _creator = creator;
             _finalizer = finalizer;
             _free = new Stack<T>();
@@ -81,39 +82,5 @@ namespace SomaSim.Utils
             _free.Push(element);
             return result;
         }
-    }
-
-    /// <summary>
-    /// Canonical implementation of a FactoryPool that keeps a pool of StringBuilder instances for reuse.
-    /// </summary>
-    public class StringBuilderPool : FactoryPool<string, StringBuilder>
-    {
-        /// <summary>
-        /// Use this initializer to properly set up the string builder pool.
-        /// </summary>
-        public void Initialize () {
-            this.Initialize(
-                () => new StringBuilder(),
-                (StringBuilder sb) => {
-                    string result = sb.ToString();
-                    sb.Length = 0;
-                    return result;
-                });
-        }
-
-        //
-        // singleton interface
-
-        private static StringBuilderPool _instance;
-        public static StringBuilderPool Instance {
-            get {
-                if (_instance == null) { 
-                    _instance = new StringBuilderPool();
-                    _instance.Initialize();
-                }
-                return _instance;
-            }
-        }
-
     }
 }

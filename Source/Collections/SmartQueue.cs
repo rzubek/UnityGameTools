@@ -1,11 +1,12 @@
-﻿using System;
+﻿// Copyright (C) SomaSim LLC. 
+// Open source software. Please see LICENSE file for details.
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 
-namespace SomaSim.Collections
+namespace SomaSim.Util
 {
     /// <summary>
     /// Interface for queue elements that get informed when they're added or removed,
@@ -21,15 +22,17 @@ namespace SomaSim.Collections
 
         /// <summary>
         /// Called when this queue element becomes the head element. This could happen
-        /// because 1. another head element in front of it just got dequeued, or
-        /// 2. this element was enqueued as the only element.
+        /// because 1. another head element in front of it just got dequeued, 
+        /// 2. this element was enqueued as the only element, or 3. this element
+        /// got pushed back onto the head of the queue (in this case the "pushedbach" parameter will be true)
         /// </summary>
-        void OnActivated ();
+        void OnActivated (bool pushedback);
 
         /// <summary>
         /// Called when the queue element ceases to be the head one. This happens either
         /// as a result of 1. getting dequeued (in which case this function gets called 
-        /// before the dequeue one), or 2. another object being pushed back in front of it.
+        /// before the dequeue one), or 2. another object being pushed back in front of it
+        /// (in this case the "pushedbach" parameter will be true).
         /// </summary>
         void OnDeactivated (bool pushedback);
 
@@ -45,7 +48,7 @@ namespace SomaSim.Collections
     {
         public object Queue { get; private set; }
         public bool IsActive { get; private set; }
-        public bool IsEnqueued { get { return Queue != null; } }
+        public bool IsEnqueued => Queue != null;
 
         /// <inheritDoc />
         virtual public void OnEnqueued (object queue) {
@@ -53,7 +56,7 @@ namespace SomaSim.Collections
         }
 
         /// <inheritDoc />
-        virtual public void OnActivated () {
+        virtual public void OnActivated (bool pushedback) {
             if (IsEnqueued) { this.IsActive = true; } else { throw new InvalidOperationException("Only enqueued elements can be activated"); }
         }
 
@@ -68,6 +71,11 @@ namespace SomaSim.Collections
         }
     }
 
+    /// <summary>
+    /// Implementation of a queue which informs its elements when they're being
+    /// added or removed, and when they're at the head of the queue.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     [DebuggerDisplay("Count = {Count}")]
     public class SmartQueue<T> : IEnumerable<T>, ICollection<T>, IEnumerable
         where T : class, ISmartQueueElement
@@ -85,7 +93,7 @@ namespace SomaSim.Collections
         /// <summary>
         /// Returns true if the queue is empty
         /// </summary>
-        public bool IsEmpty { get { return _queue.Count == 0; } }
+        public bool IsEmpty => _queue.Count == 0;
 
         /// <summary>
         /// Adds a new element to the end of the queue. If it's the only element,
@@ -97,7 +105,7 @@ namespace SomaSim.Collections
             element.OnEnqueued(this);
 
             if (_queue.Count == 1) {
-                element.OnActivated();
+                element.OnActivated(false);
             }
         }
 
@@ -106,9 +114,19 @@ namespace SomaSim.Collections
         /// If the queue was previously empty, the first element will be activated 
         /// when it's pushed.
         /// </summary>
-        /// <param name="elements"></param>
         public void Enqueue (List<T> elements) {
-            for (int i = 0, count = elements.Count; i < count; i++) { 
+            for (int i = 0, count = elements.Count; i < count; i++) {
+                Enqueue(elements[i]);
+            }
+        }
+
+        /// <summary>
+        /// Adds a collection of new elements to the end of the queue.
+        /// If the queue was previously empty, the first element will be activated 
+        /// when it's pushed.
+        /// </summary>
+        public void Enqueue (T[] elements) {
+            for (int i = 0, count = elements.Length; i < count; i++) {
                 Enqueue(elements[i]);
             }
         }
@@ -126,7 +144,7 @@ namespace SomaSim.Collections
 
             _queue.AddFirst(element);
             element.OnEnqueued(this);
-            element.OnActivated();
+            element.OnActivated(true);
         }
 
         /// <summary>
@@ -145,7 +163,7 @@ namespace SomaSim.Collections
             _queue.RemoveFirst();
 
             if (!IsEmpty) {
-                _queue.PeekFirst().OnActivated();
+                _queue.PeekFirst().OnActivated(false);
             }
 
             return head;
@@ -176,54 +194,40 @@ namespace SomaSim.Collections
         /// Returns the head element on the queue without removing it, or null if empty.
         /// </summary>
         /// <returns></returns>
-        public T Head { get { return IsEmpty ? null : _queue.PeekFirst(); } }
+        public T Head => IsEmpty ? null : _queue.PeekFirst();
 
         /// <summary>
         /// Returns the tail element of the queue without removing it, or null if empty.
         /// </summary>
         /// <returns></returns>
-        public T Tail { get { return IsEmpty ? null : _queue.PeekLast(); } }
+        public T Tail => IsEmpty ? null : _queue.PeekLast();
 
         #region IEnumerable Members
 
         /// <inheritDoc />
-        public IEnumerator<T> GetEnumerator () {
-            return _queue.GetEnumerator();
-        }
+        public IEnumerator<T> GetEnumerator () => _queue.GetEnumerator();
 
         /// <inheritDoc />
-        IEnumerator IEnumerable.GetEnumerator () {
-            return _queue.GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator () => _queue.GetEnumerator();
 
         #endregion
 
         #region ICollection Members
 
         /// <inheritDoc />
-        public void CopyTo (T[] array, int index) {
-            _queue.CopyTo(array, index);
-        }
+        public void CopyTo (T[] array, int index) => _queue.CopyTo(array, index);
 
         /// <inheritDoc />
-        public int Count {
-            get { return _queue.Count; }
-        }
+        public int Count => _queue.Count;
 
         /// <inheritDoc />
-        public bool IsSynchronized {
-            get { return false; }
-        }
+        public bool IsSynchronized => false;
 
         /// <inheritDoc />
-        public object SyncRoot {
-            get { return this; }
-        }
+        public object SyncRoot => this;
 
         /// <inheritDoc />
-        public void Add (T item) {
-            Enqueue(item);
-        }
+        public void Add (T item) => Enqueue(item);
 
         /// <inheritDoc />
         public void Clear () {
@@ -233,19 +237,13 @@ namespace SomaSim.Collections
         }
 
         /// <inheritDoc />
-        public bool Contains (T item) {
-            return _queue.Contains(item);
-        }
+        public bool Contains (T item) => _queue.Contains(item);
 
         /// <inheritDoc />
-        public bool IsReadOnly {
-            get { return false; }
-        }
+        public bool IsReadOnly => false;
 
         /// <inheritDoc />
-        public bool Remove (T item) {
-            throw new NotImplementedException();
-        }
+        public bool Remove (T item) => throw new NotImplementedException();
 
         #endregion
     }

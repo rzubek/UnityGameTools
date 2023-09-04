@@ -1,9 +1,11 @@
-﻿using System;
+﻿// Copyright (C) SomaSim LLC. 
+// Open source software. Please see LICENSE file for details.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
-namespace SomaSim.Collections
+namespace SomaSim.Util
 {
     /// <summary>
     /// Implementation of a least-recently used cache.
@@ -18,9 +20,7 @@ namespace SomaSim.Collections
             public K key;
             public V value;
 
-            public static bool KeyEquals (K a, K b) {
-                return EqualityComparer<K>.Default.Equals(a, b);
-            }
+            public static bool KeyEquals (K a, K b) => EqualityComparer<K>.Default.Equals(a, b);
         }
 
         /// <summary>
@@ -32,7 +32,7 @@ namespace SomaSim.Collections
         /// <summary>
         /// Returns the total number of items in the LRU cache. This number will never exceed capacity.
         /// </summary>
-        public int Count { get { return _lruList.Count; } }
+        public int Count => _lruList.Count;
 
         private Dictionary<K, LinkedListNode<Item>> _cacheMap;
         private LinkedList<Item> _lruList;
@@ -40,9 +40,10 @@ namespace SomaSim.Collections
         /// <summary>
         /// Creates a new LRU cache with specified max capacity. 
         /// </summary>
-        /// <param name="capacity"></param>
         public LRUCache (int capacity) {
-            if (capacity <= 0) throw new ArgumentOutOfRangeException("capacity", "Cache capacity must be greater than zero");
+            if (capacity <= 0) {
+                throw new ArgumentOutOfRangeException("capacity", "Cache capacity must be greater than zero");
+            }
 
             this.Capacity = capacity;
 
@@ -54,28 +55,21 @@ namespace SomaSim.Collections
         /// Returns true if this cache contains a value with the specified key.
         /// Accessing this function does not affect the key's last access time.
         /// </summary>
-        /// <param name="key"></param>
-        /// <returns></returns>
-        public bool ContainsKey (K key) {
-            return _cacheMap.ContainsKey(key);
-        }
+        public bool ContainsKey (K key) => _cacheMap.ContainsKey(key);
 
         /// <summary>
         /// Retrieves cached item from the LRU cache. If the key exists in the cache,
         /// updates its last access time and returns the value. Otherwise 
         /// returns a default value for type V. 
         /// </summary>
-        /// <param name="key"></param>
-        /// <returns></returns>
         public V Get (K key) {
-            LinkedListNode<Item> node;
-            if (_cacheMap.TryGetValue(key, out node)) {
+            if (_cacheMap.TryGetValue(key, out LinkedListNode<Item> node)) {
                 V value = node.Value.value;
                 _lruList.Remove(node);
                 _lruList.AddLast(node);
                 return value;
             }
-            return default(V);
+            return default;
         }
 
         /// <summary>
@@ -83,8 +77,6 @@ namespace SomaSim.Collections
         /// if the cache is at capacity. The new item becomes the most recently used.
         /// Attempting to add a key that already exists in the cache will throw an exception.
         /// </summary>
-        /// <param name="key"></param>
-        /// <param name="val"></param>
         public void Add (K key, V val) {
             Item cacheItem = new Item() { key = key, value = val };
             LinkedListNode<Item> newnode = new LinkedListNode<Item>(cacheItem);
@@ -102,11 +94,8 @@ namespace SomaSim.Collections
         /// Removes the item with the specified key from the cache and returns true, 
         /// or returns false if this key was not in the cache.
         /// </summary>
-        /// <param name="key"></param>
-        /// <returns></returns>
         public bool Remove (K key) {
-            LinkedListNode<Item> node;
-            if (_cacheMap.TryGetValue(key, out node)) {
+            if (_cacheMap.TryGetValue(key, out LinkedListNode<Item> node)) {
                 _lruList.Remove(node);
                 return _cacheMap.Remove(key);
             }
@@ -129,15 +118,12 @@ namespace SomaSim.Collections
         /// Accessing this function does not affect the key's last access time.
         /// For internal use only, as this operation is O(n) in cache size.
         /// </summary>
-        /// <param name="key"></param>
-        /// <param name="i"></param>
-        /// <returns></returns>
         internal bool ContainsKeyAt (K key, int i) {
             if (i < 0 || i >= _lruList.Count) {
                 return false;
             }
 
-            if (! _cacheMap.ContainsKey(key)) {
+            if (!_cacheMap.ContainsKey(key)) {
                 return false;
             }
 

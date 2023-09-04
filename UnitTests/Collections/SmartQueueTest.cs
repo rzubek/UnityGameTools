@@ -1,6 +1,7 @@
-﻿using System;
+﻿// Copyright (C) SomaSim LLC. 
+// Open source software. Please see LICENSE file for details.
 
-namespace SomaSim.Collections
+namespace SomaSim.Util
 {
     [TestClass]
     public class SmartQueueTest
@@ -22,8 +23,8 @@ namespace SomaSim.Collections
                 enqueuedCount++;
             }
 
-            public override void OnActivated () {
-                base.OnActivated();
+            public override void OnActivated (bool pushedback) {
+                base.OnActivated(pushedback);
                 activationCount++;
             }
 
@@ -66,7 +67,7 @@ namespace SomaSim.Collections
             Assert.IsTrue(q.Head == e1 && q.Tail == e2 && q.Count == 2 && !q.IsEmpty);
             Assert.IsTrue(e1.enqueuedCount == 1 && e1.activationCount == 1); // same as before
             Assert.IsTrue(e1.IsEnqueued);
-            Assert.IsTrue(e1.IsActive); 
+            Assert.IsTrue(e1.IsActive);
             // but the second one shouldn't be active yet
             Assert.IsTrue(e2.enqueuedCount == 1 && e2.activationCount == 0); // enq'd, inactive
             Assert.IsTrue(e2.IsEnqueued);
@@ -82,7 +83,7 @@ namespace SomaSim.Collections
             Assert.IsFalse(e1.IsEnqueued);
             Assert.IsTrue(e1.pushedBackCount == 0 && e1.poppedTailCount == 0); // nothing unexpected here
             // verify e2 activated
-            Assert.IsTrue(e2.enqueuedCount == 1 && e2.activationCount == 1); 
+            Assert.IsTrue(e2.enqueuedCount == 1 && e2.activationCount == 1);
             Assert.IsTrue(e2.IsActive);
 
             // now deq e2 and verify things cleaned up

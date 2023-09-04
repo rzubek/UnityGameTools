@@ -1,11 +1,12 @@
-﻿using System;
+﻿// Copyright (C) SomaSim LLC. 
+// Open source software. Please see LICENSE file for details.
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 
-namespace SomaSim.Collections
+namespace SomaSim.Util
 {
     /// <summary>
     /// Interface for stack elements that get informed when they're pushed or popped,
@@ -21,17 +22,19 @@ namespace SomaSim.Collections
 
         /// <summary>
         /// Called when the stack element becomes the topmost one. This could happen
-        /// either because 1. this element was just pushed on top of the stack, or 
-        /// 2. when this element was right beneath another topmost element, that just got popped.
+        /// either because 1. this element was just pushed on top of the stack 
+        /// (in which case the "pushed" parameter will be true), or 2. when this element 
+        /// was right beneath another topmost element, that just got popped.
         /// </summary>
-        void OnActivated ();
+        void OnActivated (bool pushed);
 
         /// <summary>
         /// Called when the stack element ceases to be the topmost one. This happens either
         /// as a result of 1. another element being pushed on top of this one, or
-        /// 2. right before this element is popped off the stack.
+        /// 2. right before this element is popped off the stack (in which case the 
+        /// "popped" parameter will be true).
         /// </summary>
-        void OnDeactivated ();
+        void OnDeactivated (bool popped);
 
         /// <summary>
         /// Called just before this topmost stack element is removed from the stack.
@@ -43,7 +46,7 @@ namespace SomaSim.Collections
     {
         public object Stack { get; private set; }
         public bool IsActive { get; private set; }
-        public bool IsOnStack { get { return Stack != null; } }
+        public bool IsOnStack => Stack != null;
 
         /// <inheritDoc />
         virtual public void OnPushed (object stack) {
@@ -51,12 +54,12 @@ namespace SomaSim.Collections
         }
 
         /// <inheritDoc />
-        virtual public void OnActivated () {
+        virtual public void OnActivated (bool pushed) {
             if (IsOnStack) { this.IsActive = true; } else { throw new InvalidOperationException("Only elements on the stack can be activated"); }
         }
 
         /// <inheritDoc />
-        virtual public void OnDeactivated () {
+        virtual public void OnDeactivated (bool popped) {
             if (IsOnStack) { this.IsActive = false; } else { throw new InvalidOperationException("Only elements on the stack can be deactivated"); }
         }
 
@@ -66,7 +69,12 @@ namespace SomaSim.Collections
         }
     }
 
-    [DebuggerDisplay("Count = {Count}")]
+    /// <summary>
+    /// Implementation of a stack which informs its elements when they've been
+    /// added or removed, or reached the top of the stack.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    [DebuggerDisplay("SmartStack, Count = {Count}")]
     public class SmartStack<T> : IEnumerable<T>, ICollection<T>, IEnumerable
         where T : class, ISmartStackElement
     {
@@ -79,7 +87,7 @@ namespace SomaSim.Collections
         /// <summary>
         /// Returns true if the stack is empty
         /// </summary>
-        public bool IsEmpty { get { return _stack.Count == 0; } }
+        public bool IsEmpty => _stack.Count == 0;
 
         /// <summary>
         /// Pushes a new element onto the stack and activates it as the topmost one.
@@ -89,12 +97,12 @@ namespace SomaSim.Collections
         public void Push (T element) {
             if (!IsEmpty) {
                 T top = Peek();
-                top.OnDeactivated();
+                top.OnDeactivated(false);
             }
 
             _stack.Add(element);
             element.OnPushed(this);
-            element.OnActivated();
+            element.OnActivated(true);
         }
 
         /// <summary>
@@ -108,13 +116,13 @@ namespace SomaSim.Collections
             }
 
             T old = Peek();
-            old.OnDeactivated();
+            old.OnDeactivated(true);
             old.OnPopped();
             _stack.RemoveAt(_stack.Count - 1);
 
             if (!IsEmpty) {
                 T top = Peek();
-                top.OnActivated();
+                top.OnActivated(false);
             }
 
             return old;
@@ -124,27 +132,21 @@ namespace SomaSim.Collections
         /// Returns the topmost element on the stack without removing it, or null if empty.
         /// </summary>
         /// <returns></returns>
-        public T Peek () {
-            return _stack.Count <= 0 ? null : _stack[_stack.Count - 1];
-        }
+        public T Peek () => _stack.Count <= 0 ? null : _stack[^1];
 
         /// <summary>
         /// Returns the topmost element on the stack without removing it, or null if empty.
         /// </summary>
         /// <returns></returns>
-        public T Top { get { return Peek(); } }
+        public T Top => Peek();
 
         #region IEnumerable Members
 
         /// <inheritDoc />
-        public IEnumerator<T> GetEnumerator () {
-            return _stack.GetEnumerator();
-        }
+        public IEnumerator<T> GetEnumerator () => _stack.GetEnumerator();
 
         /// <inheritDoc />
-        IEnumerator IEnumerable.GetEnumerator () {
-            return _stack.GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator () => _stack.GetEnumerator();
 
         #endregion
 
@@ -154,9 +156,8 @@ namespace SomaSim.Collections
         public bool Remove (T item) {
             if (_stack.Count == 0) {
                 throw new InvalidOperationException();
+            }
 
-            } 
-            
             if (item == Peek()) {
                 Pop();
                 return true;
@@ -174,29 +175,19 @@ namespace SomaSim.Collections
         }
 
         /// <inheritDoc />
-        public void CopyTo (T[] array, int index) {
-            _stack.CopyTo(array, index);
-        }
+        public void CopyTo (T[] array, int index) => _stack.CopyTo(array, index);
 
         /// <inheritDoc />
-        public int Count {
-            get { return _stack.Count; }
-        }
+        public int Count => _stack.Count;
 
         /// <inheritDoc />
-        public bool IsSynchronized {
-            get { return false; }
-        }
+        public bool IsSynchronized => false;
 
         /// <inheritDoc />
-        public object SyncRoot {
-            get { return this; }
-        }
+        public object SyncRoot => this;
 
         /// <inheritDoc />
-        public void Add (T item) {
-            Push(item);
-        }
+        public void Add (T item) => Push(item);
 
         /// <inheritDoc />
         public void Clear () {
@@ -206,14 +197,10 @@ namespace SomaSim.Collections
         }
 
         /// <inheritDoc />
-        public bool Contains (T item) {
-            return _stack.Contains(item);
-        }
+        public bool Contains (T item) => _stack.Contains(item);
 
         /// <inheritDoc />
-        public bool IsReadOnly {
-            get { return false; }
-        }
+        public bool IsReadOnly => false;
 
         #endregion
     }
