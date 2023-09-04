@@ -1,8 +1,10 @@
-﻿using System;
+﻿// Copyright (C) SomaSim LLC. 
+// Open source software. Please see LICENSE file for details.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 
 namespace SomaSim.Serializer
 {
@@ -32,7 +34,7 @@ namespace SomaSim.Serializer
         /// <param name="obj"></param>
         /// <param name="value"></param>
         public static void SetValue (MemberInfo i, object obj, object value) {
-            if (i is PropertyInfo) { ((PropertyInfo)i).SetValue(obj, value, null); } else if (i is FieldInfo) { ((FieldInfo)i).SetValue(obj, value); } else { /* do nothing */ }
+            if (i is PropertyInfo) { ((PropertyInfo) i).SetValue(obj, value, null); } else if (i is FieldInfo) { ((FieldInfo) i).SetValue(obj, value); } else { /* do nothing */ }
         }
 
         /// <summary>
@@ -56,8 +58,8 @@ namespace SomaSim.Serializer
         /// <returns></returns>
         public static object GetValue (MemberInfo i, object obj) {
             return
-                (i is PropertyInfo) ? ((PropertyInfo)i).GetValue(obj, null) :
-                (i is FieldInfo) ? ((FieldInfo)i).GetValue(obj) :
+                (i is PropertyInfo) ? ((PropertyInfo) i).GetValue(obj, null) :
+                (i is FieldInfo) ? ((FieldInfo) i).GetValue(obj) :
                 null;
         }
 
@@ -165,7 +167,7 @@ namespace SomaSim.Serializer
         /// <param name="name"></param>
         public static void MakeMemberInstances (object obj, string name) {
             MemberInfo member = GetMember(obj, name);
-            if (member != null) { 
+            if (member != null) {
                 object instance = Activator.CreateInstance(GetMemberType(member), null);
                 SetValue(member, obj, instance);
             }

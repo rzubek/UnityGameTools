@@ -1,9 +1,12 @@
+﻿// Copyright (C) SomaSim LLC. 
+// Open source software. Please see LICENSE file for details.
+
 using System;
 using System.Collections;
 using System.Globalization;
 using System.Text;
 
-namespace SomaSim.Serializer
+namespace SomaSim.SION
 {
     // Code from http://techblog.procurios.nl/k/618/news/view/14605/14863/how-do-i-write-my-own-parser-(for-json).html
 
@@ -248,7 +251,7 @@ namespace SomaSim.Serializer
                                 return "";
                             }
                             // convert the integer codepoint to a unicode char and add to string
-                            s.Append(Char.ConvertFromUtf32((int)codePoint));
+                            s.Append(Char.ConvertFromUtf32((int) codePoint));
                             // skip 4 chars
                             index += 4;
                         } else {
@@ -389,14 +392,14 @@ namespace SomaSim.Serializer
             bool success = true;
 
             if (value is string) {
-                success = SerializeString((string)value, builder);
+                success = SerializeString((string) value, builder);
             } else if (value is Hashtable) {
-                success = SerializeObject((Hashtable)value, builder);
+                success = SerializeObject((Hashtable) value, builder);
             } else if (value is ArrayList) {
-                success = SerializeArray((ArrayList)value, builder);
-            } else if ((value is Boolean) && ((Boolean)value == true)) {
+                success = SerializeArray((ArrayList) value, builder);
+            } else if ((value is Boolean) && ((Boolean) value == true)) {
                 builder.Append("true");
-            } else if ((value is Boolean) && ((Boolean)value == false)) {
+            } else if ((value is Boolean) && ((Boolean) value == false)) {
                 builder.Append("false");
             } else if (value is ValueType) {
                 // thanks to ritchie for pointing out ValueType to me
@@ -497,4 +500,3 @@ namespace SomaSim.Serializer
         }
     }
 }
-

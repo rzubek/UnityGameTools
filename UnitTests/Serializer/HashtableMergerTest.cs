@@ -1,16 +1,15 @@
 ﻿// Copyright (C) SomaSim LLC. 
 // Open source software. Please see LICENSE file for details.
 
-using SomaSim.SION;
 using System.Collections;
 
-namespace SomaSim.Serializer
+namespace SomaSim.SION
 {
     [TestClass]
-    public class JSONMergerTest
+    public class HashtableMergerTest
     {
         [TestMethod]
-        public void TestMerger () {
+        public void TestHashtableMerger () {
             object parent = JSON.JsonDecode(@"
                 {
                     ""Base"": ""base"",
@@ -36,7 +35,7 @@ namespace SomaSim.Serializer
                 }
             ");
 
-            var result = JSONMerger.Merge(parent, child);
+            var result = HashtableMerger.Merge(parent, child, false);
             Hashtable r = result as Hashtable;
             Assert.IsNotNull(r);
 
@@ -60,6 +59,33 @@ namespace SomaSim.Serializer
 
             Assert.IsTrue(s["FrameTypes"] is ArrayList);
             Assert.IsTrue((s["FrameTypes"] as ArrayList).Count == 2);
+        }
+
+
+        [TestMethod]
+        public void TestHashtableMergerArrayListSettings () {
+            object parent = JSON.JsonDecode(@"{ ""Test"": [ 1, 2, 3 ] }");
+            object child = JSON.JsonDecode(@"{ ""Test"": [ 4, 5 ] }");
+
+            // first test replacing parent with child
+            var result = HashtableMerger.Merge(parent, child, false);
+            ArrayList arr = ((result as Hashtable)["Test"]) as ArrayList;
+            Assert.IsNotNull(arr);
+            Assert.IsTrue(arr.Count == 2);
+            Assert.IsTrue((double) arr[0] == 4);
+            Assert.IsTrue((double) arr[1] == 5);
+
+            // second test merging parent with child
+            result = HashtableMerger.Merge(parent, child, true);
+            arr = ((result as Hashtable)["Test"]) as ArrayList;
+            Assert.IsNotNull(arr);
+            Assert.IsTrue(arr.Count == 5);
+            Assert.IsTrue((double) arr[0] == 1);
+            Assert.IsTrue((double) arr[1] == 2);
+            Assert.IsTrue((double) arr[2] == 3);
+            Assert.IsTrue((double) arr[3] == 4);
+            Assert.IsTrue((double) arr[4] == 5);
+
         }
     }
 }

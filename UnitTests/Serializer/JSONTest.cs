@@ -1,10 +1,9 @@
-﻿using System;
-using System.Text;
-using System.Collections.Generic;
-using System.Collections;
-using System.Reflection;
+﻿// Copyright (C) SomaSim LLC. 
+// Open source software. Please see LICENSE file for details.
 
-namespace SomaSim.Serializer
+using System.Collections;
+
+namespace SomaSim.SION
 {
     [TestClass]
     public class JSONTest
@@ -40,6 +39,4 @@ namespace SomaSim.Serializer
             Assert.IsNotNull(encoded);
         }
     }
-
-
 }

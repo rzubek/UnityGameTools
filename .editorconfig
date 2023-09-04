@@ -1,0 +1,88 @@
+root = true
+
+# https://docs.microsoft.com/en-us/visualstudio/ide/editorconfig-code-style-settings-reference?view=vs-2019#example-editorconfig-file
+
+[*.cs]
+
+file_header_template = Copyright (C) SomaSim LLC. \nOpen source software. Please see LICENSE file for details.
+
+# spaces over tabs, yo
+indent_size = 4
+indent_style = space
+trim_trailing_whitespace = true
+end_of_line = crlf
+charset = utf-8-bom
+
+# we like braces
+csharp_prefer_braces = true:warning
+# some spacing questions
+csharp_space_between_method_declaration_name_and_open_parenthesis  = true
+csharp_space_between_method_call_name_and_opening_parenthesis = false
+csharp_space_after_cast = true
+# fewer newlines for more vertical economy
+csharp_new_line_before_open_brace = types
+csharp_new_line_before_else = false
+csharp_new_line_before_catch = false
+csharp_new_line_before_finally = false
+csharp_new_line_before_members_in_object_initializers = false
+csharp_new_line_before_members_in_anonymous_types = false
+# allow for single line blocks
+csharp_preserve_single_line_blocks = true
+# expression syntax preferred over blocks
+csharp_style_expression_bodied_methods = true:suggestion
+csharp_style_expression_bodied_operators = true:suggestion
+csharp_style_expression_bodied_properties = true:suggestion
+csharp_style_expression_bodied_indexers = true:suggestion
+csharp_style_expression_bodied_accessors = true:suggestion
+# don't suggest adding readonly keyword (bc serialization)
+dotnet_style_readonly_field = false
+
+# override VS suggestions for C# 7 or later features that Unity doesn't support
+# or .Net naming preferences which the Unity world flagrantly ignores :)
+
+# IDE0017: Simplify object initialization
+dotnet_style_object_initializer = false:silent
+# IDE0028: Simplify collection initialization
+dotnet_style_collection_initializer = false:silent
+# IDE0032: Use auto property
+dotnet_style_prefer_auto_properties = false
+# IDE0054: Use compound assignment
+dotnet_style_prefer_compound_assignment = false
+# IDE0062: Make local function 'static'
+csharp_prefer_static_local_function = false
+# IDE0063: Use simple 'using' statement
+csharp_prefer_simple_using_statement = false
+# IDE0066: Convert switch statement to expression
+csharp_style_prefer_switch_expression = false
+# IDE0075: Simplify conditional expression    # this just turns ?: into confusing booleans
+dotnet_style_prefer_simplified_boolean_expressions = false
+# IDE0090: Use 'new(...)'
+csharp_style_implicit_object_creation_when_type_is_apparent = false
+
+# IDE0051: Remove unused private members
+dotnet_diagnostic.IDE0051.severity = none
+# IDE1006: Naming Styles  # e.g. lowercase public properties
+dotnet_diagnostic.IDE1006.severity = none
+# IDE0079: Remove unnecessary suppression  # doesn't work with our DEBUG ifdefs
+dotnet_diagnostic.IDE0079.severity = none
+# IDE0251: Make member 'readonly' # this one is triggering unnecessarily
+dotnet_diagnostic.IDE0251.severity = none
+
+## make some unity suggestions stronger
+
+# UNT0008: Null propagation on Unity objects
+dotnet_diagnostic.UNT0008.severity = warning
+
+## override some unity suggestions we don't care about
+
+# UNT0017: SetPixels invocation is slow (who cares, we do it rarely)
+dotnet_diagnostic.UNT0017.severity = none
+# UNT0019: Indirection call (ibid.)
+dotnet_diagnostic.UNT0019.severity = none
+# UNT0022: Inefficient position/rotation assignment (ibid.)
+dotnet_diagnostic.UNT0022.severity = none
+# UNT0024: Give priority to scalar calculations over vector calculations
+# (it's erroneously getting applied to scalar calcs? is this a bug?)
+dotnet_diagnostic.UNT0024.severity = none
+
+

@@ -4,7 +4,7 @@
 using System;
 using System.Collections;
 
-namespace SomaSim.Serializer
+namespace SomaSim.SION
 {
     /// <summary>
     /// Helper class to merge two JSON structures. 
@@ -12,19 +12,31 @@ namespace SomaSim.Serializer
     /// When merging a parent with a child, it will produce a new structure such that:
     /// - Each key/value pair from the parent is copied into result 
     /// - Then each key/value pair from the child is copied into result, and in case of a conflict:
-    ///   - If child's value is scalar (string, bool, double) or ArrayList, overrides parent's value
-    ///   - If child's value is a hashtable, but paren't wasn't, also overrides
-    ///   - If both values were hashtables, recursively merge them as well
+    ///   - If child's value is string or primitive (bool, double, etc), overrides parent's value
+    ///   - If child's value is a Hashtable or ArrayList, but parent wasn't, overrides
+    ///   - If both values are ArrayList, either overrides or appends parent's value, depending on settings
+    ///   - If both values are hashtables, recursively merge them
     /// </summary>
-    public class JSONMerger
+    public class HashtableMerger
     {
         public static bool ThrowExceptionOnBadData = false;
 
-        public static object Merge (object parent, object child) {
+        public static object Merge (object parent, object child, bool arrayappend = false) {
             if (IsScalar(child)) {
                 return child;
+
             } else if (child is ArrayList) {
-                return child;
+                if (!arrayappend || !(parent is ArrayList)) {
+                    return child;
+                } else {
+                    ArrayList parray = parent as ArrayList;
+                    ArrayList carray = child as ArrayList;
+                    ArrayList result = new ArrayList(parray.Count + carray.Count);
+                    result.AddRange(parray);
+                    result.AddRange(carray);
+                    return result;
+                }
+
             } else if (child is Hashtable) {
                 if (!(parent is Hashtable)) {
                     return child;
@@ -39,7 +51,7 @@ namespace SomaSim.Serializer
 
                     foreach (DictionaryEntry entry in chash) {
                         if (result.ContainsKey(entry.Key)) {
-                            result[entry.Key] = JSONMerger.Merge(phash[entry.Key], chash[entry.Key]);
+                            result[entry.Key] = Merge(phash[entry.Key], chash[entry.Key], arrayappend);
                         } else {
                             result[entry.Key] = chash[entry.Key];
                         }
@@ -54,7 +66,7 @@ namespace SomaSim.Serializer
         }
 
         private static bool IsScalar (object value) {
-            return value is double || value is bool || value is string;
+            return value.GetType().IsPrimitive || value is string;
         }
     }
 }

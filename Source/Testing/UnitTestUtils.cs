@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (C) SomaSim LLC. 
+// Open source software. Please see LICENSE file for details.
+
+using System;
 
 namespace SomaSim
 {
@@ -12,10 +15,11 @@ namespace SomaSim
     {
     }
 
-    public class UnitTestException : Exception {
-        public UnitTestException () : base() {}
-        public UnitTestException (string message) : base(message) {}
-        public UnitTestException (string message, Exception exception) : base(message, exception) {}
+    public class UnitTestException : Exception
+    {
+        public UnitTestException () : base() { }
+        public UnitTestException (string message) : base(message) { }
+        public UnitTestException (string message, Exception exception) : base(message, exception) { }
     }
 
     public class Assert
@@ -35,7 +39,7 @@ namespace SomaSim
         public static void IsNotNull (object value) {
             if (value == null) { throw new UnitTestException("Assert.IsNotNull failed"); }
         }
-    
+
         public static void IsInstanceOfType (object value, Type type) {
             var valueType = (value != null) ? value.GetType() : null;
             if (valueType != type) { throw new UnitTestException("Assert.IsInstanceOfType failed, expected " + type + ", got " + valueType); }
